@@ -119,6 +119,53 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &36128691
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 36128693}
+  - component: {fileID: 36128692}
+  m_Layer: 0
+  m_Name: Scene2Controller
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &36128692
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 36128691}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c5cd7f6a591949fd8365ee1d3c0408c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Scene2Controller
+  openPanelButton: {fileID: 1866761013}
+  panel: {fileID: 1352017604}
+  addCheeseButton: {fileID: 2113974959}
+--- !u!4 &36128693
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 36128691}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.02217, y: -2.27793, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &384577717
 GameObject:
   m_ObjectHideFlags: 0
@@ -409,64 +456,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 953179716}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &730765443
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 730765445}
-  - component: {fileID: 730765444}
-  - component: {fileID: 730765446}
-  m_Layer: 0
-  m_Name: GameManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &730765444
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 730765443}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7903ac9101a26466b8e6ac04f1ff49c0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::OpenWindow
-  panelInfoCheese: {fileID: 1352017604}
---- !u!4 &730765445
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 730765443}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -3.25637, y: -3.71346, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &730765446
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 730765443}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 46b23d6960b6d4f46b1b20b70c9c37b1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::StealingCheese
 --- !u!1 &787562113
 GameObject:
   m_ObjectHideFlags: 0
@@ -2444,9 +2433,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 730765444}
-        m_TargetAssemblyTypeName: OpenWindow, Assembly-CSharp
-        m_MethodName: OpenWindowCheese
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: Scene2Controller, Assembly-CSharp
+        m_MethodName: OpenPanel
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2947,9 +2936,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 730765446}
-        m_TargetAssemblyTypeName: StealingCheese, Assembly-CSharp
-        m_MethodName: ProcessStealingCheese
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: Scene2Controller, Assembly-CSharp
+        m_MethodName: AddCheeseAndGoBack
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3004,5 +2993,5 @@ SceneRoots:
   - {fileID: 1640080571}
   - {fileID: 384577718}
   - {fileID: 1232724892}
-  - {fileID: 730765445}
   - {fileID: 953179716}
+  - {fileID: 36128693}
