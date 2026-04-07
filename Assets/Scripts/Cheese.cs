@@ -3,13 +3,41 @@ using UnityEngine.UI;
 
 public class Cheese : MonoBehaviour
 {
-   [SerializeField] private int cheeseCount;
-   
-   [SerializeField] private Text cheeseCountText;
+    public static Cheese Instance;
 
-   public void ClickCheese()
-   {
-      cheeseCount++;
-      cheeseCountText.text = cheeseCount.ToString();
-   }
+    private int cheeseCount;
+    private Text cheeseText;
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    public void AddCheese(int amount)
+    {
+        cheeseCount += amount;
+        UpdateUI();
+    }
+
+    public void SetText(Text newText)
+    {
+        cheeseText = newText;
+        UpdateUI();
+    }
+
+    private void UpdateUI()
+    {
+        if (cheeseText != null)
+        {
+            cheeseText.text = cheeseCount.ToString();
+        }
+    }
 }
