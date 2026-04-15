@@ -14,6 +14,11 @@ public class Scene1Controller : MonoBehaviour
 
         UpdateCheeseText(GameManager.Instance.GetCheeseCount());
         GameManager.Instance.OnCheeseChanged += UpdateCheeseText;
+
+        if (GameManager.Instance.ShouldShowBarrel())
+        {
+            GameManager.Instance.TriggerBarrelReward();
+        }
     }
 
     private void OnDestroy()
