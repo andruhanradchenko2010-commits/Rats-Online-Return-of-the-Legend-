@@ -14,7 +14,7 @@ public class Scene2Controller : MonoBehaviour
             openPanelButton.onClick.AddListener(OpenPanel);
 
         if (addCheeseButton != null)
-            addCheeseButton.onClick.AddListener(AddCheeseAndGoBack);
+            addCheeseButton.onClick.AddListener(OnForwardButtonClicked);
 
         if (panel != null)
             panel.SetActive(false);
@@ -26,9 +26,10 @@ public class Scene2Controller : MonoBehaviour
             panel.SetActive(true);
     }
 
-    public void AddCheeseAndGoBack()
+    public void OnForwardButtonClicked()
     {
-        GameManager.Instance.AddCheese(1);
+        int randomCheeseAmount = Random.Range(1, 6);
+        GameManager.Instance.SetPendingReward(randomCheeseAmount);
         SceneManager.LoadScene("MainWindow");
     }
 }
