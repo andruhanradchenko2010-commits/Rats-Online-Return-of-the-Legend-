@@ -810,7 +810,6 @@ bool CanOverfeed(Rat enemy)
 
 ## 👥 Авторы
 
-- **Оригинальная игра:** "Крысы Online" (ВКонтакте)
 - **Воссоздание:** Rats Online: Return of the Legend Team
 
 ---
