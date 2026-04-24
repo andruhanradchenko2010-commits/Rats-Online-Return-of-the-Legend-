@@ -5,12 +5,19 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
-    private int cheeseCount = 0;
     private int pendingCheeseReward = 0;
     private bool shouldShowBarrel = false;
 
-    public event Action<int> OnCheeseChanged;
     public event Action<int> OnBarrelRewardReady;
+
+    [Header("Manager References")]
+    [SerializeField] private GameObject currencyManagerPrefab;
+    [SerializeField] private GameObject ratManagerPrefab;
+    [SerializeField] private GameObject battleManagerPrefab;
+    [SerializeField] private GameObject dailyChestManagerPrefab;
+    [SerializeField] private GameObject arenaManagerPrefab;
+    [SerializeField] private GameObject dungeonManagerPrefab;
+    [SerializeField] private GameObject inventoryManagerPrefab;
 
     private void Awake()
     {
@@ -18,6 +25,7 @@ public class GameManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            InitializeManagers();
         }
         else
         {
@@ -26,15 +34,46 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void InitializeManagers()
+    {
+        CreateManager<CurrencyManager>("CurrencyManager", currencyManagerPrefab);
+        CreateManager<RatManager>("RatManager", ratManagerPrefab);
+        CreateManager<BattleManager>("BattleManager", battleManagerPrefab);
+        CreateManager<DailyChestManager>("DailyChestManager", dailyChestManagerPrefab);
+        CreateManager<ArenaManager>("ArenaManager", arenaManagerPrefab);
+        CreateManager<DungeonManager>("DungeonManager", dungeonManagerPrefab);
+        CreateManager<InventoryManager>("InventoryManager", inventoryManagerPrefab);
+    }
+
+    private void CreateManager<T>(string name, GameObject prefab) where T : MonoBehaviour
+    {
+        var instance = FindObjectOfType<T>();
+        if (instance != null) return;
+
+        if (prefab != null)
+        {
+            Instantiate(prefab);
+        }
+        else
+        {
+            GameObject go = new GameObject(name);
+            go.AddComponent<T>();
+            DontDestroyOnLoad(go);
+        }
+    }
+
+    // Старые методы для совместимости
     public void AddCheese(int amount)
     {
-        cheeseCount += amount;
-        OnCheeseChanged?.Invoke(cheeseCount);
+        if (CurrencyManager.Instance != null)
+            CurrencyManager.Instance.AddCheese(amount);
     }
 
     public int GetCheeseCount()
     {
-        return cheeseCount;
+        if (CurrencyManager.Instance != null)
+            return CurrencyManager.Instance.GetCheese();
+        return 0;
     }
 
     public void SetPendingReward(int amount)

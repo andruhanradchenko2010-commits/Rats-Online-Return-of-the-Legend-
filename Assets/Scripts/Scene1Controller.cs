@@ -12,10 +12,13 @@ public class Scene1Controller : MonoBehaviour
         if (goToScene2Button != null)
             goToScene2Button.onClick.AddListener(GoToScene2);
 
-        UpdateCheeseText(GameManager.Instance.GetCheeseCount());
-        GameManager.Instance.OnCheeseChanged += UpdateCheeseText;
+        if (CurrencyManager.Instance != null)
+        {
+            UpdateCheeseText(CurrencyManager.Instance.GetCheese());
+            CurrencyManager.Instance.OnCheeseChanged += UpdateCheeseText;
+        }
 
-        if (GameManager.Instance.ShouldShowBarrel())
+        if (GameManager.Instance != null && GameManager.Instance.ShouldShowBarrel())
         {
             GameManager.Instance.TriggerBarrelReward();
         }
@@ -23,8 +26,8 @@ public class Scene1Controller : MonoBehaviour
 
     private void OnDestroy()
     {
-        if (GameManager.Instance != null)
-            GameManager.Instance.OnCheeseChanged -= UpdateCheeseText;
+        if (CurrencyManager.Instance != null)
+            CurrencyManager.Instance.OnCheeseChanged -= UpdateCheeseText;
     }
 
     private void UpdateCheeseText(int count)

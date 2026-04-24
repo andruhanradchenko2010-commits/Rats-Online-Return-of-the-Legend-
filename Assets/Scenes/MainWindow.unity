@@ -183,7 +183,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 9
+  m_SortingOrder: 10
   m_MaskInteraction: 0
   m_Sprite: {fileID: 6733470169086547140, guid: c710d328f524248439d69a8767328e06, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -204,7 +204,7 @@ Transform:
   m_GameObject: {fileID: 63825774}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -10.38, y: -10.12, z: 0}
+  m_LocalPosition: {x: -11.33, y: -10.26, z: 0}
   m_LocalScale: {x: 0.72519493, y: 0.72519493, z: 0.72519493}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -881,41 +881,6 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
---- !u!1 &506997943
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 506997944}
-  m_Layer: 0
-  m_Name: CheeseSpawnPoint
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &506997944
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 506997943}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 630783500}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &536258132
 GameObject:
   m_ObjectHideFlags: 0
@@ -1191,7 +1156,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BarrelRewardController
   barrel: {fileID: 129520619}
   cheesePrefab: {fileID: 5073140070758005037, guid: 76e4e5c9e3a384713a01c45dc44d398a, type: 3}
-  cheeseSpawnPoint: {fileID: 885012277}
+  cheeseSpawnPoint: {fileID: 0}
   barrelAutoDisappearTime: 2
   cheeseAutoCollectTime: 5
   cheeseSpawnRadius: {x: 200, y: 150}
@@ -1294,10 +1259,8 @@ RectTransform:
   - {fileID: 2027792205}
   - {fileID: 1846995038}
   - {fileID: 729076180}
-  - {fileID: 506997944}
   - {fileID: 617670812}
   - {fileID: 129520620}
-  - {fileID: 885012277}
   - {fileID: 2143723793}
   - {fileID: 1833146830}
   - {fileID: 951097147}
@@ -1429,6 +1392,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c97b11a47e734956ae71ae65b78cde2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
+  currencyManagerPrefab: {fileID: 0}
+  ratManagerPrefab: {fileID: 0}
+  battleManagerPrefab: {fileID: 0}
+  dailyChestManagerPrefab: {fileID: 0}
+  arenaManagerPrefab: {fileID: 0}
+  dungeonManagerPrefab: {fileID: 0}
+  inventoryManagerPrefab: {fileID: 0}
 --- !u!4 &669290037
 Transform:
   m_ObjectHideFlags: 0
@@ -1702,41 +1672,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &885012276
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 885012277}
-  m_Layer: 0
-  m_Name: CheeseSpawnPoint
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &885012277
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 885012276}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 630783500}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &951097146
 GameObject:
   m_ObjectHideFlags: 0
@@ -2015,8 +1950,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1219256836}
+  - component: {fileID: 1219256837}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: GameInitializer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2037,6 +1973,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1219256837
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1219256835}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0e4d31d34b434b58abcc83f362bdbd3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameInitializer
+  autoCreateManagers: 1
+  showDebugInfo: 1
 --- !u!1 &1239537641
 GameObject:
   m_ObjectHideFlags: 0
@@ -2613,7 +2563,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BarrelRewardController
   barrel: {fileID: 729076179}
   cheesePrefab: {fileID: 5073140070758005037, guid: 76e4e5c9e3a384713a01c45dc44d398a, type: 3}
-  cheeseSpawnPoint: {fileID: 506997944}
+  cheeseSpawnPoint: {fileID: 0}
   barrelAutoDisappearTime: 2
   cheeseAutoCollectTime: 5
   cheeseSpawnRadius: {x: 200, y: 150}
@@ -2785,7 +2735,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 24, y: 404}
+  m_AnchoredPosition: {x: 24, y: 369}
   m_SizeDelta: {x: 304.66, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &2064845849

@@ -55,6 +55,11 @@ ExportedObj/
 *.opendb
 *.VC.db
 
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
 # Unity3D generated meta files
 *.pidb.meta
 *.pdb.meta
