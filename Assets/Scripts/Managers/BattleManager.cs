@@ -6,6 +6,16 @@ public class BattleManager : MonoBehaviour
 {
     public static BattleManager Instance;
 
+    [Header("Steal Settings")]
+    [Tooltip("Максимальный шанс воровства в процентах")]
+    public float maxStealChance = 95f;
+
+    [Tooltip("Шанс воровства на 1 уровне крысы в процентах")]
+    public float minStealChance = 0f;
+
+    [Tooltip("Уровень крысы для достижения максимального шанса")]
+    public int levelForMaxChance = 55;
+
     private void Awake()
     {
         if (Instance == null)
@@ -30,6 +40,14 @@ public class BattleManager : MonoBehaviour
         public List<Rat> overfedEnemies;
     }
 
+    // Расчет шанса воровства на основе уровня крысы
+    private float CalculateStealChance(Rat rat)
+    {
+        // Линейная интерполяция от minStealChance до maxStealChance
+        float chance = minStealChance + ((rat.level - 1) / (float)(levelForMaxChance - 1)) * (maxStealChance - minStealChance);
+        return Mathf.Clamp(chance, minStealChance, maxStealChance);
+    }
+
     // PvP атака на другого игрока
     public BattleResult AttackPlayer(List<Rat> enemyRats, int enemyCheese)
     {
@@ -48,56 +66,31 @@ public class BattleManager : MonoBehaviour
             return result;
         }
 
-        // Подсчет силы
-        int playerPower = playerRats.Sum(r => r.theftSkill + r.attackSkill + r.level);
-        int enemyPower = enemyRats.Sum(r => r.defenseSkill + r.level);
+        // Берем первую крысу для атаки (можно расширить логику)
+        Rat attackingRat = playerRats[0];
 
-        // Определяем победителя
-        float winChance = (float)playerPower / (playerPower + enemyPower);
-        result.victory = Random.value < winChance;
+        // Рассчитываем шанс воровства на основе уровня крысы
+        float stealChance = CalculateStealChance(attackingRat);
+
+        // Проверяем успех воровства
+        float roll = Random.Range(0f, 100f);
+        result.victory = roll < stealChance;
 
         if (result.victory)
         {
-            // Победа - крадем сыр
+            // Успешное воровство - крадем сыр
             result.cheeseStolen = Mathf.Min(enemyCheese, Random.Range(10, 50));
             CurrencyManager.Instance.AddCheese(result.cheeseStolen);
 
-            // Шанс закормить вражеских крыс
-            foreach (var enemyRat in enemyRats)
-            {
-                if (Random.value < 0.3f) // 30% шанс
-                {
-                    // Проверяем, может ли наша крыса закормить эту
-                    var capableRat = playerRats.FirstOrDefault(r => r.CanOverfeed(enemyRat));
-                    if (capableRat != null)
-                    {
-                        result.overfedEnemies.Add(enemyRat);
-                        result.soulsGained += Random.Range(1, 3);
-                        result.elixirsGained += Random.Range(0, 2);
-                    }
-                }
-            }
-
-            CurrencyManager.Instance.AddSouls(result.soulsGained);
-            CurrencyManager.Instance.AddLoveElixirs(result.elixirsGained);
+            // Крыса становится голодной после успешной атаки
+            attackingRat.SetHungry();
         }
         else
         {
-            // Поражение - наши крысы прибиты
-            foreach (var rat in playerRats)
-            {
-                if (Random.value < 0.5f) // 50% шанс быть прибитым
-                {
-                    rat.Beat();
-                    result.beatenRats.Add(rat);
-                }
-            }
-        }
-
-        // Все крысы становятся голодными после битвы
-        foreach (var rat in playerRats)
-        {
-            rat.SetHungry();
+            // Провал - крыса становится подбитой
+            attackingRat.Beat();
+            result.beatenRats.Add(attackingRat);
+            result.cheeseStolen = 0;
         }
 
         return result;

@@ -9,6 +9,10 @@ public class RatManager : MonoBehaviour
 
     private List<Rat> rats = new List<Rat>();
 
+    [Header("Heal Settings")]
+    [Tooltip("Время восстановления подбитой крысы в секундах")]
+    public float healTimeSeconds = 30f;
+
     public event Action<Rat> OnRatAdded;
     public event Action<Rat> OnRatRemoved;
     public event Action<Rat> OnRatUpdated;
@@ -24,6 +28,27 @@ public class RatManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
+        }
+    }
+
+    private void Update()
+    {
+        // Автоматически проверяем и лечим крыс, которые восстановились
+        CheckAndHealBeatenRats();
+    }
+
+    private void CheckAndHealBeatenRats()
+    {
+        foreach (var rat in rats)
+        {
+            if (rat.state == RatState.Beaten)
+            {
+                if (Time.time - rat.healStartTime >= healTimeSeconds)
+                {
+                    rat.Heal();
+                    OnRatUpdated?.Invoke(rat);
+                }
+            }
         }
     }
 
@@ -197,8 +222,7 @@ public class RatManager : MonoBehaviour
         else
         {
             // Проверяем, прошло ли достаточно времени
-            float healTime = rat.level * 60f; // 1 минута на уровень (упрощенно)
-            if (Time.time - rat.healStartTime >= healTime)
+            if (Time.time - rat.healStartTime >= healTimeSeconds)
             {
                 rat.Heal();
                 OnRatUpdated?.Invoke(rat);
@@ -308,10 +332,8 @@ public class RatManager : MonoBehaviour
         }
         else
         {
-            // Создаем стартовых крыс
+            // Создаем стартовую крысу
             CreateRat(RatType.Gray, 1);
-            CreateRat(RatType.Gray, 1);
-            CreateRat(RatType.Gray, 2);
         }
     }
 

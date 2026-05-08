@@ -28,8 +28,57 @@ public class Scene2Controller : MonoBehaviour
 
     public void OnForwardButtonClicked()
     {
-        int randomCheeseAmount = Random.Range(1, 6);
-        GameManager.Instance.SetPendingReward(randomCheeseAmount);
+        // Получаем первую крысу игрока
+        var rats = RatManager.Instance.GetAllRats();
+        if (rats.Count == 0)
+        {
+            Debug.LogError("Нет крыс!");
+            SceneManager.LoadScene("MainWindow");
+            return;
+        }
+
+        Rat playerRat = rats[0];
+
+        // Проверяем может ли крыса атаковать
+        if (!playerRat.CanFight())
+        {
+            Debug.Log("Крыса не может атаковать (подбита или мертва)");
+            GameManager.Instance.SetPendingReward(0);
+            SceneManager.LoadScene("MainWindow");
+            return;
+        }
+
+        // Рассчитываем шанс воровства на основе уровня крысы
+        float stealChance = CalculateStealChance(playerRat);
+        float roll = Random.Range(0f, 100f);
+
+        if (roll < stealChance)
+        {
+            // Успех - крадем сыр
+            int stolenCheese = Random.Range(10, 51);
+            GameManager.Instance.SetPendingReward(stolenCheese);
+            playerRat.SetHungry();
+            Debug.Log($"Успех! Украдено {stolenCheese} сыра. Шанс был {stealChance:F1}%");
+        }
+        else
+        {
+            // Провал - крыса подбита
+            playerRat.Beat();
+            GameManager.Instance.SetPendingReward(0);
+            Debug.Log($"Провал! Крыса подбита на 30 секунд. Шанс был {stealChance:F1}%");
+        }
+
         SceneManager.LoadScene("MainWindow");
+    }
+
+    private float CalculateStealChance(Rat rat)
+    {
+        // Копируем логику из BattleManager
+        float minChance = 0f;
+        float maxChance = 95f;
+        int maxLevel = 55;
+
+        float chance = minChance + ((rat.level - 1) / (float)(maxLevel - 1)) * (maxChance - minChance);
+        return Mathf.Clamp(chance, minChance, maxChance);
     }
 }
