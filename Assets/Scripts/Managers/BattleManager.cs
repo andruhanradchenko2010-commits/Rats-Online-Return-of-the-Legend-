@@ -40,8 +40,8 @@ public class BattleManager : MonoBehaviour
         public List<Rat> overfedEnemies;
     }
 
-    // Расчет шанса воровства на основе уровня крысы
-    private float CalculateStealChance(Rat rat)
+    // Расчет шанса воровства на основе уровня крысы (публичный метод для использования в других скриптах)
+    public float CalculateStealChance(Rat rat)
     {
         // Линейная интерполяция от minStealChance до maxStealChance
         float chance = minStealChance + ((rat.level - 1) / (float)(levelForMaxChance - 1)) * (maxStealChance - minStealChance);

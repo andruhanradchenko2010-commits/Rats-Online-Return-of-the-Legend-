@@ -48,8 +48,8 @@ public class Scene2Controller : MonoBehaviour
             return;
         }
 
-        // Рассчитываем шанс воровства на основе уровня крысы
-        float stealChance = CalculateStealChance(playerRat);
+        // Рассчитываем шанс воровства через BattleManager
+        float stealChance = BattleManager.Instance.CalculateStealChance(playerRat);
         float roll = Random.Range(0f, 100f);
 
         if (roll < stealChance)
@@ -69,16 +69,5 @@ public class Scene2Controller : MonoBehaviour
         }
 
         SceneManager.LoadScene("MainWindow");
-    }
-
-    private float CalculateStealChance(Rat rat)
-    {
-        // Копируем логику из BattleManager
-        float minChance = 0f;
-        float maxChance = 95f;
-        int maxLevel = 55;
-
-        float chance = minChance + ((rat.level - 1) / (float)(maxLevel - 1)) * (maxChance - minChance);
-        return Mathf.Clamp(chance, minChance, maxChance);
     }
 }

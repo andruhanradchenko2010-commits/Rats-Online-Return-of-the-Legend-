@@ -19,10 +19,29 @@ public class RatVisualizer : MonoBehaviour, IPointerClickHandler
             ratImage = GetComponent<Image>();
         }
 
+        // Подписываемся на события изменения крыс
+        if (RatManager.Instance != null)
+        {
+            RatManager.Instance.OnRatAdded += OnRatChanged;
+            RatManager.Instance.OnRatRemoved += OnRatChanged;
+            RatManager.Instance.OnRatUpdated += OnRatChanged;
+        }
+
         UpdateRatVisual();
     }
 
-    private void Update()
+    private void OnDestroy()
+    {
+        // Отписываемся от событий
+        if (RatManager.Instance != null)
+        {
+            RatManager.Instance.OnRatAdded -= OnRatChanged;
+            RatManager.Instance.OnRatRemoved -= OnRatChanged;
+            RatManager.Instance.OnRatUpdated -= OnRatChanged;
+        }
+    }
+
+    private void OnRatChanged(Rat rat)
     {
         UpdateRatVisual();
     }

@@ -54,7 +54,7 @@ public class RatListItem : MonoBehaviour
         if (selectButton != null)
             selectButton.onClick.AddListener(() => onSelect?.Invoke());
 
-        // TODO: Загрузить спрайт крысы из ресурсов
+        // Загружаем спрайт крысы через SpriteHelper
         LoadRatSprite();
     }
 
@@ -62,35 +62,7 @@ public class RatListItem : MonoBehaviour
     {
         if (ratIcon == null) return;
 
-        // Пытаемся загрузить спрайт из папки Sprite
-        string spriteName = rat.type switch
-        {
-            RatType.Gray => "Серая крыса",
-            RatType.Royal => "Царская крыса",
-            RatType.Angel => "Ангельская крыса",
-            RatType.Devil => "Дьявольская крыса",
-            RatType.Vampire => "Вампир",
-            RatType.Joker => "Джокер",
-            RatType.BatRat => "Bat Rat",
-            _ => "Серая крыса"
-        };
-
-        Sprite sprite = Resources.Load<Sprite>($"Sprites/{spriteName}");
-
-        if (sprite != null)
-        {
-            ratIcon.sprite = sprite;
-        }
-        else
-        {
-            // Если спрайт не найден, создаем красный квадрат
-            Texture2D tex = new Texture2D(64, 64);
-            Color[] pixels = new Color[64 * 64];
-            for (int i = 0; i < pixels.Length; i++)
-                pixels[i] = Color.red;
-            tex.SetPixels(pixels);
-            tex.Apply();
-            ratIcon.sprite = Sprite.Create(tex, new Rect(0, 0, 64, 64), new Vector2(0.5f, 0.5f));
-        }
+        // Используем SpriteHelper для загрузки спрайта
+        ratIcon.sprite = SpriteHelper.LoadRatSprite(rat.type);
     }
 }
