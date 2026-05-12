@@ -26,16 +26,24 @@ public class Scene1Controller : MonoBehaviour
             RatManager.Instance.OnRatUpdated += OnRatChanged;
         }
 
-        if (GameManager.Instance != null && GameManager.Instance.ShouldShowBarrel())
-        {
-            GameManager.Instance.TriggerBarrelReward();
-        }
-
         // Проверяем состояние кнопки при старте
         UpdateAttackButtonState();
 
         // Запускаем периодическую проверку для таймера восстановления
         StartCoroutine(CheckButtonStateRoutine());
+
+        // Вызываем бочку с задержкой, чтобы BarrelRewardController успел подписаться
+        StartCoroutine(TriggerBarrelAfterDelay());
+    }
+
+    private System.Collections.IEnumerator TriggerBarrelAfterDelay()
+    {
+        yield return null; // Ждем один кадр, чтобы все Start() методы выполнились
+
+        if (GameManager.Instance != null && GameManager.Instance.ShouldShowBarrel())
+        {
+            GameManager.Instance.TriggerBarrelReward();
+        }
     }
 
     private System.Collections.IEnumerator CheckButtonStateRoutine()
@@ -102,7 +110,14 @@ public class Scene1Controller : MonoBehaviour
     private void UpdateCheeseText(int count)
     {
         if (textCountCheese != null)
+        {
             textCountCheese.text = count.ToString();
+            Debug.Log($"Scene1Controller.UpdateCheeseText: Обновлен текст сыра на {count}");
+        }
+        else
+        {
+            Debug.LogError("Scene1Controller.UpdateCheeseText: textCountCheese = NULL!");
+        }
     }
 
     public void GoToScene2()

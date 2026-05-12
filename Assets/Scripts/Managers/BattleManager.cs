@@ -16,16 +16,55 @@ public class BattleManager : MonoBehaviour
     [Tooltip("Уровень крысы для достижения максимального шанса")]
     public int levelForMaxChance = 55;
 
+    [Header("Test Settings")]
+    [Tooltip("Включить режим тестирования (фиксированный шанс)")]
+    public bool testMode = false; // Управляется через GameManager.TEST_MODE
+
+    [Tooltip("Фиксированный шанс воровства в тестовом режиме (0-100%)")]
+    [Range(0f, 100f)]
+    public float testStealChance = 100f; // Управляется через GameManager.TEST_MODE
+
+    [Header("Rewards")]
+    [Tooltip("Минимальное количество украденного сыра")]
+    public int minStolenCheese = 10; // Управляется через GameManager.TEST_MODE
+
+    [Tooltip("Максимальное количество украденного сыра")]
+    public int maxStolenCheese = 51; // Управляется через GameManager.TEST_MODE
+
     private void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+
+            // Применяем настройки из GameManager
+            ApplyTestModeSettings();
         }
         else
         {
             Destroy(gameObject);
+        }
+    }
+
+    private void ApplyTestModeSettings()
+    {
+        if (GameManager.Instance != null && GameManager.Instance.TEST_MODE)
+        {
+            // Тестовый режим
+            testMode = true;
+            testStealChance = 100f;
+            minStolenCheese = 50;
+            maxStolenCheese = 100;
+            Debug.Log("🎮 BattleManager: ТЕСТОВЫЙ РЕЖИМ (100% успех, 50-100 сыра)");
+        }
+        else
+        {
+            // Нормальная игра
+            testMode = false;
+            minStolenCheese = 10;
+            maxStolenCheese = 51;
+            Debug.Log("⚔️ BattleManager: НОРМАЛЬНЫЙ РЕЖИМ (баланс)");
         }
     }
 
@@ -43,6 +82,12 @@ public class BattleManager : MonoBehaviour
     // Расчет шанса воровства на основе уровня крысы (публичный метод для использования в других скриптах)
     public float CalculateStealChance(Rat rat)
     {
+        // Режим тестирования - возвращаем фиксированный шанс
+        if (testMode)
+        {
+            return testStealChance;
+        }
+
         // Линейная интерполяция от minStealChance до maxStealChance
         float chance = minStealChance + ((rat.level - 1) / (float)(levelForMaxChance - 1)) * (maxStealChance - minStealChance);
         return Mathf.Clamp(chance, minStealChance, maxStealChance);
@@ -79,7 +124,7 @@ public class BattleManager : MonoBehaviour
         if (result.victory)
         {
             // Успешное воровство - крадем сыр
-            result.cheeseStolen = Mathf.Min(enemyCheese, Random.Range(10, 50));
+            result.cheeseStolen = Mathf.Min(enemyCheese, Random.Range(minStolenCheese, maxStolenCheese));
             CurrencyManager.Instance.AddCheese(result.cheeseStolen);
 
             // Крыса становится голодной после успешной атаки
