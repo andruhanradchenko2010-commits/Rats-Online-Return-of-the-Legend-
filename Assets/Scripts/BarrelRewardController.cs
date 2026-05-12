@@ -41,6 +41,14 @@ public class BarrelRewardController : MonoBehaviour
 
     private void ShowBarrel(int amount)
     {
+        // Не показываем бочку, если награда 0 или меньше
+        if (amount <= 0)
+        {
+            Debug.Log("BarrelRewardController: Награда 0 или меньше, бочка не показывается");
+            GameManager.Instance.ClearPendingReward();
+            return;
+        }
+
         cheeseAmount = amount;
         barrelClicked = false;
 
