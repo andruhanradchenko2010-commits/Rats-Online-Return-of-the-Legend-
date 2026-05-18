@@ -13,6 +13,13 @@ public class RatManager : MonoBehaviour
     [Tooltip("Время восстановления подбитой крысы в секундах")]
     public float healTimeSeconds = 30f;
 
+    [Header("Test Settings")]
+    [Tooltip("Включить быстрое лечение для тестирования")]
+    public bool fastHealMode = false; // Управляется через GameManager.TEST_MODE
+
+    [Tooltip("Время быстрого лечения в секундах")]
+    public float fastHealTimeSeconds = 2f; // Управляется через GameManager.TEST_MODE
+
     public event Action<Rat> OnRatAdded;
     public event Action<Rat> OnRatRemoved;
     public event Action<Rat> OnRatUpdated;
@@ -23,11 +30,32 @@ public class RatManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+
+            // Применяем настройки из GameManager
+            ApplyTestModeSettings();
+
             LoadRats();
         }
         else
         {
             Destroy(gameObject);
+        }
+    }
+
+    private void ApplyTestModeSettings()
+    {
+        if (GameManager.Instance != null && GameManager.Instance.TEST_MODE)
+        {
+            // Тестовый режим
+            fastHealMode = true;
+            fastHealTimeSeconds = 2f;
+            Debug.Log("🎮 RatManager: ТЕСТОВЫЙ РЕЖИМ (лечение 2 сек)");
+        }
+        else
+        {
+            // Нормальная игра
+            fastHealMode = false;
+            Debug.Log("⚔️ RatManager: НОРМАЛЬНЫЙ РЕЖИМ (лечение 30 сек)");
         }
     }
 
@@ -39,11 +67,13 @@ public class RatManager : MonoBehaviour
 
     private void CheckAndHealBeatenRats()
     {
+        float healTime = fastHealMode ? fastHealTimeSeconds : healTimeSeconds;
+
         foreach (var rat in rats)
         {
             if (rat.state == RatState.Beaten)
             {
-                if (Time.time - rat.healStartTime >= healTimeSeconds)
+                if (Time.time - rat.healStartTime >= healTime)
                 {
                     rat.Heal();
                     OnRatUpdated?.Invoke(rat);

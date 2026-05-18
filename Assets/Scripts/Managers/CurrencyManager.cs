@@ -39,6 +39,7 @@ public class CurrencyManager : MonoBehaviour
     public void AddCheese(int amount)
     {
         cheese += amount;
+        Debug.Log($"CurrencyManager.AddCheese: +{amount} сыра. Всего: {cheese}. Подписчиков на событие: {OnCheeseChanged?.GetInvocationList().Length ?? 0}");
         OnCheeseChanged?.Invoke(cheese);
         SaveData();
     }

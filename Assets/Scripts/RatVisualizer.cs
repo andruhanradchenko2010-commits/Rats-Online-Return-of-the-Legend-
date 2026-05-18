@@ -19,6 +19,28 @@ public class RatVisualizer : MonoBehaviour, IPointerClickHandler
             ratImage = GetComponent<Image>();
         }
 
+        // Автозагрузка спрайтов из Resources, если не назначены
+        if (healthyRatSprite == null)
+        {
+            healthyRatSprite = Resources.Load<Sprite>("Sprites/Gray rat");
+            if (healthyRatSprite == null)
+            {
+                healthyRatSprite = SpriteHelper.LoadRatSprite(RatType.Gray);
+            }
+            Debug.Log($"RatVisualizer: Загружен спрайт здоровой крысы: {healthyRatSprite != null}");
+        }
+
+        if (woundedRatSprite == null)
+        {
+            woundedRatSprite = Resources.Load<Sprite>("Sprites/Wounded rat");
+            if (woundedRatSprite == null)
+            {
+                // Пытаемся найти в Assets/Sprite/Types of rats/
+                woundedRatSprite = Resources.Load<Sprite>("Types of rats/Wounded rat");
+            }
+            Debug.Log($"RatVisualizer: Загружен спрайт раненой крысы: {woundedRatSprite != null}");
+        }
+
         // Подписываемся на события изменения крыс
         if (RatManager.Instance != null)
         {
@@ -48,14 +70,24 @@ public class RatVisualizer : MonoBehaviour, IPointerClickHandler
 
     private void UpdateRatVisual()
     {
-        if (ratImage == null) return;
-        if (RatManager.Instance == null) return;
+        if (ratImage == null)
+        {
+            Debug.LogWarning("RatVisualizer: ratImage == null!");
+            return;
+        }
+
+        if (RatManager.Instance == null)
+        {
+            Debug.LogWarning("RatVisualizer: RatManager.Instance == null!");
+            return;
+        }
 
         var rats = RatManager.Instance.GetAllRats();
 
         if (rats.Count == 0)
         {
             ratImage.enabled = false;
+            Debug.Log("RatVisualizer: Нет крыс, Image отключен");
             return;
         }
 
@@ -65,11 +97,27 @@ public class RatVisualizer : MonoBehaviour, IPointerClickHandler
         // Меняем спрайт в зависимости от состояния
         if (rat.state == RatState.Beaten || rat.state == RatState.Dead)
         {
-            ratImage.sprite = woundedRatSprite;
+            if (woundedRatSprite != null)
+            {
+                ratImage.sprite = woundedRatSprite;
+                Debug.Log($"RatVisualizer: Установлен спрайт РАНЕНОЙ крысы (состояние: {rat.state})");
+            }
+            else
+            {
+                Debug.LogError("RatVisualizer: woundedRatSprite == null! Не могу показать раненую крысу!");
+            }
         }
         else
         {
-            ratImage.sprite = healthyRatSprite;
+            if (healthyRatSprite != null)
+            {
+                ratImage.sprite = healthyRatSprite;
+                Debug.Log($"RatVisualizer: Установлен спрайт здоровой крысы (состояние: {rat.state})");
+            }
+            else
+            {
+                Debug.LogError("RatVisualizer: healthyRatSprite == null! Не могу показать здоровую крысу!");
+            }
         }
     }
 
