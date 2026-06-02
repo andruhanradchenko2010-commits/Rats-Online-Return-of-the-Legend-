@@ -37,11 +37,7 @@ public class BreedingUI : MonoBehaviour
 
     private void RefreshRatSelection()
     {
-        // Очищаем список
-        foreach (Transform child in ratSelectionContainer)
-        {
-            Destroy(child.gameObject);
-        }
+        UIHelper.ClearContainer(ratSelectionContainer);
 
         // Показываем только крыс максимального уровня для своего вида
         List<Rat> rats = RatManager.Instance.GetAllRats();

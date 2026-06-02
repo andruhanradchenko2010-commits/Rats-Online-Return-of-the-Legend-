@@ -2,10 +2,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DailyChestManager : MonoBehaviour
+public class DailyChestManager : SingletonManager<DailyChestManager>
 {
-    public static DailyChestManager Instance;
-
     [System.Serializable]
     public class DailyQuest
     {
@@ -23,22 +21,9 @@ public class DailyChestManager : MonoBehaviour
     public event Action<List<DailyQuest>> OnQuestsUpdated;
     public event Action OnChestOpened;
 
-    private void Awake()
+    protected override void OnInitialize()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-            LoadData();
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-    }
-
-    private void Start()
-    {
+        LoadData();
         CheckChestAvailability();
     }
 
@@ -180,26 +165,25 @@ public class DailyChestManager : MonoBehaviour
 
     private void SaveData()
     {
-        PlayerPrefs.SetString("LastChestTime", lastChestTime.ToString());
-        PlayerPrefs.SetInt("ChestAvailable", chestAvailable ? 1 : 0);
+        SaveSystem.SaveString("LastChestTime", lastChestTime.ToString());
+        SaveSystem.SaveBool("ChestAvailable", chestAvailable);
 
         // Сохраняем квесты
         for (int i = 0; i < currentQuests.Count; i++)
         {
-            PlayerPrefs.SetString($"Quest_{i}_Desc", currentQuests[i].description);
-            PlayerPrefs.SetInt($"Quest_{i}_Completed", currentQuests[i].completed ? 1 : 0);
-            PlayerPrefs.SetInt($"Quest_{i}_Cheese", currentQuests[i].cheeseReward);
-            PlayerPrefs.SetInt($"Quest_{i}_Souls", currentQuests[i].soulsReward);
-            PlayerPrefs.SetInt($"Quest_{i}_Elixirs", currentQuests[i].elixirsReward);
+            SaveSystem.SaveString($"Quest_{i}_Desc", currentQuests[i].description);
+            SaveSystem.SaveBool($"Quest_{i}_Completed", currentQuests[i].completed);
+            SaveSystem.SaveInt($"Quest_{i}_Cheese", currentQuests[i].cheeseReward);
+            SaveSystem.SaveInt($"Quest_{i}_Souls", currentQuests[i].soulsReward);
+            SaveSystem.SaveInt($"Quest_{i}_Elixirs", currentQuests[i].elixirsReward);
         }
-        PlayerPrefs.SetInt("QuestCount", currentQuests.Count);
-
-        PlayerPrefs.Save();
+        SaveSystem.SaveInt("QuestCount", currentQuests.Count);
+        SaveSystem.Save();
     }
 
     private void LoadData()
     {
-        string lastChestStr = PlayerPrefs.GetString("LastChestTime", "");
+        string lastChestStr = SaveSystem.LoadString("LastChestTime", "");
         if (string.IsNullOrEmpty(lastChestStr))
         {
             lastChestTime = DateTime.Now.AddHours(-25); // Сундук доступен сразу
@@ -209,21 +193,21 @@ public class DailyChestManager : MonoBehaviour
             DateTime.TryParse(lastChestStr, out lastChestTime);
         }
 
-        chestAvailable = PlayerPrefs.GetInt("ChestAvailable", 0) == 1;
+        chestAvailable = SaveSystem.LoadBool("ChestAvailable", false);
 
         // Загружаем квесты
-        int questCount = PlayerPrefs.GetInt("QuestCount", 0);
+        int questCount = SaveSystem.LoadInt("QuestCount", 0);
         currentQuests.Clear();
 
         for (int i = 0; i < questCount; i++)
         {
             DailyQuest quest = new DailyQuest
             {
-                description = PlayerPrefs.GetString($"Quest_{i}_Desc", ""),
-                completed = PlayerPrefs.GetInt($"Quest_{i}_Completed", 0) == 1,
-                cheeseReward = PlayerPrefs.GetInt($"Quest_{i}_Cheese", 0),
-                soulsReward = PlayerPrefs.GetInt($"Quest_{i}_Souls", 0),
-                elixirsReward = PlayerPrefs.GetInt($"Quest_{i}_Elixirs", 0)
+                description = SaveSystem.LoadString($"Quest_{i}_Desc", ""),
+                completed = SaveSystem.LoadBool($"Quest_{i}_Completed", false),
+                cheeseReward = SaveSystem.LoadInt($"Quest_{i}_Cheese", 0),
+                soulsReward = SaveSystem.LoadInt($"Quest_{i}_Souls", 0),
+                elixirsReward = SaveSystem.LoadInt($"Quest_{i}_Elixirs", 0)
             };
             currentQuests.Add(quest);
         }

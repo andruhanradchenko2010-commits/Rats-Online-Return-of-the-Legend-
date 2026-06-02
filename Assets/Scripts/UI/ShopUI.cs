@@ -34,11 +34,7 @@ public class ShopUI : MonoBehaviour
 
     private void RefreshShop()
     {
-        // Очищаем список
-        foreach (Transform child in shopItemsContainer)
-        {
-            Destroy(child.gameObject);
-        }
+        UIHelper.ClearContainer(shopItemsContainer);
 
         // Отображаем все предметы
         Dictionary<ItemType, Item> items = InventoryManager.Instance.GetAllItems();

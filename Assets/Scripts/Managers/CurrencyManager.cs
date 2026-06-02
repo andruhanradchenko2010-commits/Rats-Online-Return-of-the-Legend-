@@ -1,17 +1,15 @@
 using UnityEngine;
 using System;
 
-public class CurrencyManager : MonoBehaviour
+public class CurrencyManager : SingletonManager<CurrencyManager>
 {
-    public static CurrencyManager Instance;
-
     // Валюты
-    private int cheese = 0;              // Сыр
-    private int loveElixirs = 0;         // Любовные эликсиры (сердечки)
-    private int souls = 0;               // Души
-    private int ratBucks = 0;            // Крысобаксы (премиум)
-    private int playerExp = 0;           // Игровой опыт
-    private int playerLevel = 1;         // Уровень игрока
+    private int cheese = 0;
+    private int loveElixirs = 0;
+    private int souls = 0;
+    private int ratBucks = 0;
+    private int playerExp = 0;
+    private int playerLevel = 1;
 
     // События для обновления UI
     public event Action<int> OnCheeseChanged;
@@ -21,18 +19,9 @@ public class CurrencyManager : MonoBehaviour
     public event Action<int, int> OnPlayerExpChanged; // exp, level
     public event Action<int> OnPlayerLevelUp;
 
-    private void Awake()
+    protected override void OnInitialize()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-            LoadData();
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        LoadData();
     }
 
     // Сыр
@@ -140,7 +129,7 @@ public class CurrencyManager : MonoBehaviour
         {
             playerExp -= expNeeded;
             playerLevel++;
-            ratBucks += 13; // +13 крысобаксов за уровень
+            ratBucks += GameConfig.RAT_BUCKS_PER_LEVEL;
             OnPlayerLevelUp?.Invoke(playerLevel);
             OnRatBucksChanged?.Invoke(ratBucks);
             expNeeded = GetExpForNextLevel();
@@ -170,23 +159,23 @@ public class CurrencyManager : MonoBehaviour
     // Сохранение/загрузка
     private void SaveData()
     {
-        PlayerPrefs.SetInt("Cheese", cheese);
-        PlayerPrefs.SetInt("LoveElixirs", loveElixirs);
-        PlayerPrefs.SetInt("Souls", souls);
-        PlayerPrefs.SetInt("RatBucks", ratBucks);
-        PlayerPrefs.SetInt("PlayerExp", playerExp);
-        PlayerPrefs.SetInt("PlayerLevel", playerLevel);
-        PlayerPrefs.Save();
+        SaveSystem.SaveInt("Cheese", cheese);
+        SaveSystem.SaveInt("LoveElixirs", loveElixirs);
+        SaveSystem.SaveInt("Souls", souls);
+        SaveSystem.SaveInt("RatBucks", ratBucks);
+        SaveSystem.SaveInt("PlayerExp", playerExp);
+        SaveSystem.SaveInt("PlayerLevel", playerLevel);
+        SaveSystem.Save();
     }
 
     private void LoadData()
     {
-        cheese = PlayerPrefs.GetInt("Cheese", 100); // Стартовый сыр
-        loveElixirs = PlayerPrefs.GetInt("LoveElixirs", 5);
-        souls = PlayerPrefs.GetInt("Souls", 10);
-        ratBucks = PlayerPrefs.GetInt("RatBucks", 50);
-        playerExp = PlayerPrefs.GetInt("PlayerExp", 0);
-        playerLevel = PlayerPrefs.GetInt("PlayerLevel", 1);
+        cheese = SaveSystem.LoadInt("Cheese", 100);
+        loveElixirs = SaveSystem.LoadInt("LoveElixirs", 5);
+        souls = SaveSystem.LoadInt("Souls", 10);
+        ratBucks = SaveSystem.LoadInt("RatBucks", 50);
+        playerExp = SaveSystem.LoadInt("PlayerExp", 0);
+        playerLevel = SaveSystem.LoadInt("PlayerLevel", 1);
 
         // Уведомляем UI
         OnCheeseChanged?.Invoke(cheese);

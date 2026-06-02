@@ -29,9 +29,6 @@ public class Scene1Controller : MonoBehaviour
         // Проверяем состояние кнопки при старте
         UpdateAttackButtonState();
 
-        // Запускаем периодическую проверку для таймера восстановления
-        StartCoroutine(CheckButtonStateRoutine());
-
         // Вызываем бочку с задержкой, чтобы BarrelRewardController успел подписаться
         StartCoroutine(TriggerBarrelAfterDelay());
     }
@@ -43,15 +40,6 @@ public class Scene1Controller : MonoBehaviour
         if (GameManager.Instance != null && GameManager.Instance.ShouldShowBarrel())
         {
             GameManager.Instance.TriggerBarrelReward();
-        }
-    }
-
-    private System.Collections.IEnumerator CheckButtonStateRoutine()
-    {
-        while (true)
-        {
-            yield return new WaitForSeconds(0.5f); // Проверяем каждые 0.5 секунды
-            UpdateAttackButtonState();
         }
     }
 

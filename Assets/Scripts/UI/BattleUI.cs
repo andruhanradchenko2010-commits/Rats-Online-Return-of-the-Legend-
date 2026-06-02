@@ -52,11 +52,7 @@ public class BattleUI : MonoBehaviour
 
     private void DisplayEnemyRats()
     {
-        // Очищаем список
-        foreach (Transform child in enemyListContainer)
-        {
-            Destroy(child.gameObject);
-        }
+        UIHelper.ClearContainer(enemyListContainer);
 
         // Отображаем вражеских крыс
         foreach (Rat rat in currentEnemyRats)

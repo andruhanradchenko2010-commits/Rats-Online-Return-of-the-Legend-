@@ -75,11 +75,7 @@ public class RatsListUI : MonoBehaviour
 
     private void RefreshRatList()
     {
-        // Очищаем список
-        foreach (Transform child in ratListContainer)
-        {
-            Destroy(child.gameObject);
-        }
+        UIHelper.ClearContainer(ratListContainer);
 
         // Заполняем список крыс
         List<Rat> rats = RatManager.Instance.GetAllRats();

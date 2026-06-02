@@ -1,10 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class DungeonManager : MonoBehaviour
+public class DungeonManager : SingletonManager<DungeonManager>
 {
-    public static DungeonManager Instance;
-
     [System.Serializable]
     public class DungeonCell
     {
@@ -20,18 +18,9 @@ public class DungeonManager : MonoBehaviour
     private int dungeonWidth = 10;
     private int dungeonHeight = 10;
 
-    private void Awake()
+    protected override void OnInitialize()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-            GenerateDungeon();
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        GenerateDungeon();
     }
 
     private void GenerateDungeon()
@@ -46,7 +35,7 @@ public class DungeonManager : MonoBehaviour
                 {
                     x = x,
                     y = y,
-                    hasWall = Random.value > 0.3f, // 70% шанс стены
+                    hasWall = Random.value > GameConfig.DUNGEON_WALL_SPAWN_CHANCE,
                     isPath = false,
                     cheeseReward = Random.Range(10, 50),
                     soulsReward = Random.Range(1, 5)
@@ -125,6 +114,6 @@ public class DungeonManager : MonoBehaviour
 
     public int GetBreakCost(int x, int y)
     {
-        return 50 + (x + y) * 10;
+        return GameConfig.DUNGEON_BASE_BREAK_COST + (x + y) * GameConfig.DUNGEON_BREAK_COST_PER_DISTANCE;
     }
 }

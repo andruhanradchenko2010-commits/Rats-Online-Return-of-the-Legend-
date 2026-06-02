@@ -19,6 +19,12 @@ public static class SpriteHelper
         return redSquareSprite;
     }
 
+    private static Sprite LoadSprite(string spriteName)
+    {
+        Sprite sprite = Resources.Load<Sprite>($"Sprites/{spriteName}");
+        return sprite ?? GetRedSquare();
+    }
+
     public static Sprite LoadRatSprite(RatType type)
     {
         string spriteName = type switch
@@ -33,11 +39,7 @@ public static class SpriteHelper
             _ => "Серая крыса"
         };
 
-        // Пытаемся загрузить из Resources
-        Sprite sprite = Resources.Load<Sprite>($"Sprites/{spriteName}");
-
-        // Если не найден, возвращаем красный квадрат
-        return sprite ?? GetRedSquare();
+        return LoadSprite(spriteName);
     }
 
     public static Sprite LoadItemSprite(ItemType type)
@@ -54,19 +56,16 @@ public static class SpriteHelper
             _ => ""
         };
 
-        Sprite sprite = Resources.Load<Sprite>($"Sprites/{spriteName}");
-        return sprite ?? GetRedSquare();
+        return LoadSprite(spriteName);
     }
 
     public static Sprite LoadCheeseSprite()
     {
-        Sprite sprite = Resources.Load<Sprite>("Sprites/Сыр");
-        return sprite ?? GetRedSquare();
+        return LoadSprite("Сыр");
     }
 
     public static Sprite LoadBarrelSprite()
     {
-        Sprite sprite = Resources.Load<Sprite>("Sprites/Бочка сыра");
-        return sprite ?? GetRedSquare();
+        return LoadSprite("Бочка сыра");
     }
 }

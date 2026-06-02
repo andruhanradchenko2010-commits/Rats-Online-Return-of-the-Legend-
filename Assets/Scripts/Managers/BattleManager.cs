@@ -8,28 +8,28 @@ public class BattleManager : MonoBehaviour
 
     [Header("Steal Settings")]
     [Tooltip("Максимальный шанс воровства в процентах")]
-    public float maxStealChance = 95f;
+    public float maxStealChance = GameConfig.MAX_STEAL_CHANCE;
 
     [Tooltip("Шанс воровства на 1 уровне крысы в процентах")]
-    public float minStealChance = 0f;
+    public float minStealChance = GameConfig.MIN_STEAL_CHANCE;
 
     [Tooltip("Уровень крысы для достижения максимального шанса")]
-    public int levelForMaxChance = 55;
+    public int levelForMaxChance = GameConfig.LEVEL_FOR_MAX_STEAL_CHANCE;
 
     [Header("Test Settings")]
     [Tooltip("Включить режим тестирования (фиксированный шанс)")]
-    public bool testMode = false; // Управляется через GameManager.TEST_MODE
+    public bool testMode = false;
 
     [Tooltip("Фиксированный шанс воровства в тестовом режиме (0-100%)")]
     [Range(0f, 100f)]
-    public float testStealChance = 100f; // Управляется через GameManager.TEST_MODE
+    public float testStealChance = 100f;
 
     [Header("Rewards")]
     [Tooltip("Минимальное количество украденного сыра")]
-    public int minStolenCheese = 10; // Управляется через GameManager.TEST_MODE
+    public int minStolenCheese = GameConfig.NORMAL_MIN_STOLEN_CHEESE;
 
     [Tooltip("Максимальное количество украденного сыра")]
-    public int maxStolenCheese = 51; // Управляется через GameManager.TEST_MODE
+    public int maxStolenCheese = GameConfig.NORMAL_MAX_STOLEN_CHEESE;
 
     private void Awake()
     {
@@ -49,21 +49,19 @@ public class BattleManager : MonoBehaviour
 
     private void ApplyTestModeSettings()
     {
-        if (GameManager.Instance != null && GameManager.Instance.TEST_MODE)
+        if (GameConfig.IsTestMode)
         {
-            // Тестовый режим
             testMode = true;
             testStealChance = 100f;
-            minStolenCheese = 50;
-            maxStolenCheese = 100;
-            Debug.Log("🎮 BattleManager: ТЕСТОВЫЙ РЕЖИМ (100% успех, 50-100 сыра)");
+            minStolenCheese = GameConfig.TEST_MIN_STOLEN_CHEESE;
+            maxStolenCheese = GameConfig.TEST_MAX_STOLEN_CHEESE;
+            Debug.Log($"🎮 BattleManager: ТЕСТОВЫЙ РЕЖИМ (100% успех, {minStolenCheese}-{maxStolenCheese} сыра)");
         }
         else
         {
-            // Нормальная игра
             testMode = false;
-            minStolenCheese = 10;
-            maxStolenCheese = 51;
+            minStolenCheese = GameConfig.NORMAL_MIN_STOLEN_CHEESE;
+            maxStolenCheese = GameConfig.NORMAL_MAX_STOLEN_CHEESE;
             Debug.Log("⚔️ BattleManager: НОРМАЛЬНЫЙ РЕЖИМ (баланс)");
         }
     }
@@ -177,7 +175,7 @@ public class BattleManager : MonoBehaviour
 
             foreach (var rat in defenderRats)
             {
-                if (Random.value < 0.4f)
+                if (Random.value < GameConfig.BEATEN_RAT_CHANCE)
                 {
                     rat.Beat();
                     result.beatenRats.Add(rat);

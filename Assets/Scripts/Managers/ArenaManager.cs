@@ -1,10 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class ArenaManager : MonoBehaviour
+public class ArenaManager : SingletonManager<ArenaManager>
 {
-    public static ArenaManager Instance;
-
     [System.Serializable]
     public class ArenaPlayer
     {
@@ -26,29 +24,17 @@ public class ArenaManager : MonoBehaviour
 
     private List<ArenaPlayer> players = new List<ArenaPlayer>();
     private List<FoodItem> foodItems = new List<FoodItem>();
-    private float roundTime = 180f; // 3 минуты
+    private float roundTime = GameConfig.ARENA_ROUND_TIME;
     private float currentTime;
     private bool roundActive = false;
 
     [Header("Arena Settings")]
     public Vector2 arenaSize = new Vector2(800f, 600f);
     public int maxPlayers = 8;
-    public float foodSpawnInterval = 2f;
-    public int maxFoodItems = 20;
+    public float foodSpawnInterval = GameConfig.ARENA_FOOD_SPAWN_INTERVAL;
+    public int maxFoodItems = GameConfig.ARENA_MAX_FOOD_ITEMS;
 
     private float lastFoodSpawnTime;
-
-    private void Awake()
-    {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-    }
 
     public void StartRound()
     {

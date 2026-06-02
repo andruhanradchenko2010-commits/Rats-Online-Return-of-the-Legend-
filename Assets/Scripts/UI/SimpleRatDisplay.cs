@@ -15,10 +15,28 @@ public class SimpleRatDisplay : MonoBehaviour
             stealButton.onClick.AddListener(OnStealClicked);
         }
 
+        // Подписываемся на события изменения крыс
+        if (RatManager.Instance != null)
+        {
+            RatManager.Instance.OnRatAdded += OnRatChanged;
+            RatManager.Instance.OnRatRemoved += OnRatChanged;
+            RatManager.Instance.OnRatUpdated += OnRatChanged;
+        }
+
         UpdateDisplay();
     }
 
-    private void Update()
+    private void OnDestroy()
+    {
+        if (RatManager.Instance != null)
+        {
+            RatManager.Instance.OnRatAdded -= OnRatChanged;
+            RatManager.Instance.OnRatRemoved -= OnRatChanged;
+            RatManager.Instance.OnRatUpdated -= OnRatChanged;
+        }
+    }
+
+    private void OnRatChanged(Rat rat)
     {
         UpdateDisplay();
     }
@@ -37,7 +55,9 @@ public class SimpleRatDisplay : MonoBehaviour
         }
 
         Rat rat = rats[0];
-        float stealChance = CalculateStealChance(rat);
+        float stealChance = BattleManager.Instance != null
+            ? BattleManager.Instance.CalculateStealChance(rat)
+            : 0f;
         string state = GetStateText(rat);
 
         ratInfoText.text = $"КРЫСА:\n" +
@@ -64,15 +84,6 @@ public class SimpleRatDisplay : MonoBehaviour
                 return "Восстанавливается...";
         }
         return rat.state == RatState.Healthy ? "Здорова" : rat.state.ToString();
-    }
-
-    private float CalculateStealChance(Rat rat)
-    {
-        float minChance = 0f;
-        float maxChance = 95f;
-        int maxLevel = 55;
-        float chance = minChance + ((rat.level - 1) / (float)(maxLevel - 1)) * (maxChance - minChance);
-        return Mathf.Clamp(chance, minChance, maxChance);
     }
 
     private void OnStealClicked()

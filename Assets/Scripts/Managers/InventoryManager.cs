@@ -81,10 +81,8 @@ public class Item
     }
 }
 
-public class InventoryManager : MonoBehaviour
+public class InventoryManager : SingletonManager<InventoryManager>
 {
-    public static InventoryManager Instance;
-
     private Dictionary<ItemType, Item> inventory = new Dictionary<ItemType, Item>();
 
     // Экипировка
@@ -95,19 +93,10 @@ public class InventoryManager : MonoBehaviour
 
     public System.Action OnInventoryChanged;
 
-    private void Awake()
+    protected override void OnInitialize()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-            InitializeInventory();
-            LoadData();
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        InitializeInventory();
+        LoadData();
     }
 
     private void InitializeInventory()
@@ -278,18 +267,18 @@ public class InventoryManager : MonoBehaviour
     {
         foreach (var kvp in inventory)
         {
-            PlayerPrefs.SetInt($"Item_{kvp.Key}", kvp.Value.quantity);
+            SaveSystem.SaveInt($"Item_{kvp.Key}", kvp.Value.quantity);
         }
-        PlayerPrefs.SetInt("CouchLevel", couchLevel);
-        PlayerPrefs.Save();
+        SaveSystem.SaveInt("CouchLevel", couchLevel);
+        SaveSystem.Save();
     }
 
     private void LoadData()
     {
         foreach (var kvp in inventory)
         {
-            kvp.Value.quantity = PlayerPrefs.GetInt($"Item_{kvp.Key}", 0);
+            kvp.Value.quantity = SaveSystem.LoadInt($"Item_{kvp.Key}", 0);
         }
-        couchLevel = PlayerPrefs.GetInt("CouchLevel", 0);
+        couchLevel = SaveSystem.LoadInt("CouchLevel", 0);
     }
 }

@@ -21,6 +21,8 @@ public class ArenaUI : MonoBehaviour
     private Dictionary<string, GameObject> playerObjects = new Dictionary<string, GameObject>();
     private Dictionary<ArenaManager.FoodItem, GameObject> foodObjects = new Dictionary<ArenaManager.FoodItem, GameObject>();
 
+    private float nextUpdate = 0f;
+
     private void Start()
     {
         if (startButton != null)
@@ -47,6 +49,16 @@ public class ArenaUI : MonoBehaviour
         if (ArenaManager.Instance == null || !ArenaManager.Instance.IsRoundActive())
             return;
 
+        // Оптимизация: обновляем не каждый кадр, а с интервалом
+        if (Time.time < nextUpdate)
+        {
+            // Управление игроком обрабатываем каждый кадр для отзывчивости
+            HandlePlayerInput();
+            return;
+        }
+
+        nextUpdate = Time.time + GameConfig.ARENA_UPDATE_INTERVAL;
+
         // Обновляем таймер
         UpdateTimer();
 
@@ -58,9 +70,6 @@ public class ArenaUI : MonoBehaviour
 
         // Обновляем таблицу лидеров
         UpdateLeaderboard();
-
-        // Управление локальным игроком
-        HandlePlayerInput();
     }
 
     private void StartArena()
@@ -180,11 +189,7 @@ public class ArenaUI : MonoBehaviour
 
     private void UpdateLeaderboard()
     {
-        // Очищаем таблицу
-        foreach (Transform child in leaderboardContainer)
-        {
-            Destroy(child.gameObject);
-        }
+        UIHelper.ClearContainer(leaderboardContainer);
 
         // Заполняем таблицу
         List<ArenaManager.ArenaPlayer> players = ArenaManager.Instance.GetPlayers();

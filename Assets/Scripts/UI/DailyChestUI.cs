@@ -100,11 +100,7 @@ public class DailyChestUI : MonoBehaviour
 
     private void UpdateQuests(List<DailyChestManager.DailyQuest> quests)
     {
-        // Очищаем список
-        foreach (Transform child in questsContainer)
-        {
-            Destroy(child.gameObject);
-        }
+        UIHelper.ClearContainer(questsContainer);
 
         // Отображаем квесты
         for (int i = 0; i < quests.Count; i++)

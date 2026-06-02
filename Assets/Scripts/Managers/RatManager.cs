@@ -3,66 +3,51 @@ using System.Linq;
 using UnityEngine;
 using System;
 
-public class RatManager : MonoBehaviour
+public class RatManager : SingletonManager<RatManager>
 {
-    public static RatManager Instance;
-
     private List<Rat> rats = new List<Rat>();
 
     [Header("Heal Settings")]
     [Tooltip("Время восстановления подбитой крысы в секундах")]
-    public float healTimeSeconds = 30f;
+    public float healTimeSeconds = GameConfig.NORMAL_HEAL_TIME;
 
     [Header("Test Settings")]
     [Tooltip("Включить быстрое лечение для тестирования")]
-    public bool fastHealMode = false; // Управляется через GameManager.TEST_MODE
+    public bool fastHealMode = false;
 
     [Tooltip("Время быстрого лечения в секундах")]
-    public float fastHealTimeSeconds = 2f; // Управляется через GameManager.TEST_MODE
+    public float fastHealTimeSeconds = GameConfig.FAST_HEAL_TIME;
 
     public event Action<Rat> OnRatAdded;
     public event Action<Rat> OnRatRemoved;
     public event Action<Rat> OnRatUpdated;
 
-    private void Awake()
+    protected override void OnInitialize()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
+        ApplyTestModeSettings();
+        LoadRats();
+        InvokeRepeating(nameof(CheckAndHealBeatenRats), 1f, 1f);
+    }
 
-            // Применяем настройки из GameManager
-            ApplyTestModeSettings();
-
-            LoadRats();
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+        CancelInvoke(nameof(CheckAndHealBeatenRats));
     }
 
     private void ApplyTestModeSettings()
     {
-        if (GameManager.Instance != null && GameManager.Instance.TEST_MODE)
+        if (GameConfig.IsTestMode)
         {
-            // Тестовый режим
             fastHealMode = true;
-            fastHealTimeSeconds = 2f;
-            Debug.Log("🎮 RatManager: ТЕСТОВЫЙ РЕЖИМ (лечение 2 сек)");
+            fastHealTimeSeconds = GameConfig.FAST_HEAL_TIME;
+            Debug.Log($"🎮 RatManager: ТЕСТОВЫЙ РЕЖИМ (лечение {fastHealTimeSeconds} сек)");
         }
         else
         {
-            // Нормальная игра
             fastHealMode = false;
-            Debug.Log("⚔️ RatManager: НОРМАЛЬНЫЙ РЕЖИМ (лечение 30 сек)");
+            Debug.Log($"⚔️ RatManager: НОРМАЛЬНЫЙ РЕЖИМ (лечение {healTimeSeconds} сек)");
         }
-    }
-
-    private void Update()
-    {
-        // Автоматически проверяем и лечим крыс, которые восстановились
-        CheckAndHealBeatenRats();
     }
 
     private void CheckAndHealBeatenRats()
@@ -319,11 +304,11 @@ public class RatManager : MonoBehaviour
     // Проверка смерти закормленных крыс
     public void CheckOverfedRats()
     {
-        float deathTime = 3 * 24 * 60 * 60; // 3 дня в секундах
+        float deathTime = GameConfig.GetOverfedDeathTime();
 
-        foreach (var rat in rats.Where(r => r.state == RatState.Overfed))
+        foreach (var rat in rats)
         {
-            if (Time.time - rat.overfedTime >= deathTime)
+            if (rat.state == RatState.Overfed && Time.time - rat.overfedTime >= deathTime)
             {
                 rat.Kill();
                 OnRatUpdated?.Invoke(rat);
@@ -340,29 +325,25 @@ public class RatManager : MonoBehaviour
         SaveRats();
     }
 
-    public List<Rat> GetAllRats() => new List<Rat>(rats);
+    public IReadOnlyList<Rat> GetAllRats() => rats;
+
     public int GetRatCount() => rats.Count;
     public int GetHealthyRatCount() => rats.Count(r => r.CanFight());
 
     // Сохранение/загрузка
     private void SaveRats()
     {
-        string json = JsonUtility.ToJson(new RatListWrapper { rats = rats });
-        PlayerPrefs.SetString("Rats", json);
-        PlayerPrefs.Save();
+        RatListWrapper wrapper = new RatListWrapper { rats = rats };
+        SaveSystem.SaveObject("Rats", wrapper);
     }
 
     private void LoadRats()
     {
-        string json = PlayerPrefs.GetString("Rats", "");
-        if (!string.IsNullOrEmpty(json))
+        RatListWrapper wrapper = SaveSystem.LoadObject("Rats", new RatListWrapper());
+        rats = wrapper.rats ?? new List<Rat>();
+
+        if (rats.Count == 0)
         {
-            RatListWrapper wrapper = JsonUtility.FromJson<RatListWrapper>(json);
-            rats = wrapper.rats ?? new List<Rat>();
-        }
-        else
-        {
-            // Создаем стартовую крысу
             CreateRat(RatType.Gray, 1);
         }
     }

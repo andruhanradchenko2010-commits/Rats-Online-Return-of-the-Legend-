@@ -1,10 +1,8 @@
 using UnityEngine;
 using System;
 
-public class GameManager : MonoBehaviour
+public class GameManager : SingletonManager<GameManager>
 {
-    public static GameManager Instance;
-
     [Header("🎮 TEST MODE")]
     [Tooltip("ВКЛЮЧИТЬ = быстрое тестирование, ВЫКЛЮЧИТЬ = нормальная игра")]
     public bool TEST_MODE = true;
@@ -23,19 +21,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject dungeonManagerPrefab;
     [SerializeField] private GameObject inventoryManagerPrefab;
 
-    private void Awake()
+    protected override void OnInitialize()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-            InitializeManagers();
-        }
-        else
-        {
-            Destroy(gameObject);
-            return;
-        }
+        InitializeManagers();
     }
 
     private void InitializeManagers()
