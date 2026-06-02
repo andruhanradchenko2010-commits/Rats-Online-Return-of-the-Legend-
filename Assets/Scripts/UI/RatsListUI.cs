@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
 
-public class RatsListUI : MonoBehaviour
+public class RatsListUI : RatAwareUI
 {
     [Header("UI Elements")]
     [SerializeField] private Transform ratListContainer;
@@ -28,15 +28,8 @@ public class RatsListUI : MonoBehaviour
 
     private Rat selectedRat;
 
-    private void Start()
+    protected override void OnStart()
     {
-        if (RatManager.Instance != null)
-        {
-            RatManager.Instance.OnRatAdded += OnRatChanged;
-            RatManager.Instance.OnRatRemoved += OnRatChanged;
-            RatManager.Instance.OnRatUpdated += OnRatChanged;
-        }
-
         if (createRatButton != null)
             createRatButton.onClick.AddListener(CreateNewRat);
 
@@ -54,17 +47,7 @@ public class RatsListUI : MonoBehaviour
         UpdateSoulCost();
     }
 
-    private void OnDestroy()
-    {
-        if (RatManager.Instance != null)
-        {
-            RatManager.Instance.OnRatAdded -= OnRatChanged;
-            RatManager.Instance.OnRatRemoved -= OnRatChanged;
-            RatManager.Instance.OnRatUpdated -= OnRatChanged;
-        }
-    }
-
-    private void OnRatChanged(Rat rat)
+    protected override void OnRatChanged(Rat rat)
     {
         RefreshRatList();
         if (selectedRat != null && selectedRat.id == rat.id)
@@ -78,7 +61,7 @@ public class RatsListUI : MonoBehaviour
         UIHelper.ClearContainer(ratListContainer);
 
         // Заполняем список крыс
-        List<Rat> rats = RatManager.Instance.GetAllRats();
+        IReadOnlyList<Rat> rats = RatManager.Instance.GetAllRats();
         foreach (Rat rat in rats)
         {
             GameObject item = Instantiate(ratItemPrefab, ratListContainer);

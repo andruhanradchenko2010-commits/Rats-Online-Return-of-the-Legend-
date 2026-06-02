@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class RatVisualizer : MonoBehaviour, IPointerClickHandler
+public class RatVisualizer : RatAwareUI, IPointerClickHandler
 {
     [Header("Rat Sprites")]
     public Sprite healthyRatSprite;  // Перетащи Gray rat.png
@@ -11,7 +11,7 @@ public class RatVisualizer : MonoBehaviour, IPointerClickHandler
     [Header("UI")]
     public Image ratImage;  // Image компонент для отображения крысы
 
-    private void Start()
+    protected override void OnStart()
     {
         // Если не указан Image, берем с этого же GameObject
         if (ratImage == null)
@@ -41,29 +41,10 @@ public class RatVisualizer : MonoBehaviour, IPointerClickHandler
             Debug.Log($"RatVisualizer: Загружен спрайт раненой крысы: {woundedRatSprite != null}");
         }
 
-        // Подписываемся на события изменения крыс
-        if (RatManager.Instance != null)
-        {
-            RatManager.Instance.OnRatAdded += OnRatChanged;
-            RatManager.Instance.OnRatRemoved += OnRatChanged;
-            RatManager.Instance.OnRatUpdated += OnRatChanged;
-        }
-
         UpdateRatVisual();
     }
 
-    private void OnDestroy()
-    {
-        // Отписываемся от событий
-        if (RatManager.Instance != null)
-        {
-            RatManager.Instance.OnRatAdded -= OnRatChanged;
-            RatManager.Instance.OnRatRemoved -= OnRatChanged;
-            RatManager.Instance.OnRatUpdated -= OnRatChanged;
-        }
-    }
-
-    private void OnRatChanged(Rat rat)
+    protected override void OnRatChanged(Rat rat)
     {
         UpdateRatVisual();
     }

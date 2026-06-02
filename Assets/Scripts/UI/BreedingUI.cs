@@ -27,10 +27,32 @@ public class BreedingUI : MonoBehaviour
             breedButton.interactable = false;
         }
 
+        if (RatManager.Instance != null)
+        {
+            RatManager.Instance.OnRatAdded += OnRatChanged;
+            RatManager.Instance.OnRatRemoved += OnRatChanged;
+            RatManager.Instance.OnRatUpdated += OnRatChanged;
+        }
+
         RefreshRatSelection();
     }
 
     private void OnEnable()
+    {
+        RefreshRatSelection();
+    }
+
+    private void OnDestroy()
+    {
+        if (RatManager.Instance != null)
+        {
+            RatManager.Instance.OnRatAdded -= OnRatChanged;
+            RatManager.Instance.OnRatRemoved -= OnRatChanged;
+            RatManager.Instance.OnRatUpdated -= OnRatChanged;
+        }
+    }
+
+    private void OnRatChanged(Rat rat)
     {
         RefreshRatSelection();
     }
@@ -40,7 +62,7 @@ public class BreedingUI : MonoBehaviour
         UIHelper.ClearContainer(ratSelectionContainer);
 
         // Показываем только крыс максимального уровня для своего вида
-        List<Rat> rats = RatManager.Instance.GetAllRats();
+        IReadOnlyList<Rat> rats = RatManager.Instance.GetAllRats();
         foreach (Rat rat in rats)
         {
             if (rat.CanEvolve() && rat.CanFight())
@@ -102,8 +124,16 @@ public class BreedingUI : MonoBehaviour
 
             if (img != null)
             {
-                // TODO: Загрузить спрайт
-                img.color = Color.white;
+                Sprite ratSprite = SpriteHelper.LoadRatSprite(rat.type);
+                if (ratSprite != null)
+                {
+                    img.sprite = ratSprite;
+                    img.color = Color.white;
+                }
+                else
+                {
+                    img.color = Color.white;
+                }
             }
         }
         else

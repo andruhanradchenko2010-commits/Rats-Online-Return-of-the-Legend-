@@ -2,41 +2,23 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-public class SimpleRatDisplay : MonoBehaviour
+public class SimpleRatDisplay : RatAwareUI
 {
     [Header("UI Elements")]
     public TextMeshProUGUI ratInfoText;
     public Button stealButton;
 
-    private void Start()
+    protected override void OnStart()
     {
         if (stealButton != null)
         {
             stealButton.onClick.AddListener(OnStealClicked);
         }
 
-        // Подписываемся на события изменения крыс
-        if (RatManager.Instance != null)
-        {
-            RatManager.Instance.OnRatAdded += OnRatChanged;
-            RatManager.Instance.OnRatRemoved += OnRatChanged;
-            RatManager.Instance.OnRatUpdated += OnRatChanged;
-        }
-
         UpdateDisplay();
     }
 
-    private void OnDestroy()
-    {
-        if (RatManager.Instance != null)
-        {
-            RatManager.Instance.OnRatAdded -= OnRatChanged;
-            RatManager.Instance.OnRatRemoved -= OnRatChanged;
-            RatManager.Instance.OnRatUpdated -= OnRatChanged;
-        }
-    }
-
-    private void OnRatChanged(Rat rat)
+    protected override void OnRatChanged(Rat rat)
     {
         UpdateDisplay();
     }

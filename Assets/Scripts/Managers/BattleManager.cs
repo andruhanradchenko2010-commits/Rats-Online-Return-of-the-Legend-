@@ -2,10 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-public class BattleManager : MonoBehaviour
+public class BattleManager : SingletonManager<BattleManager>
 {
-    public static BattleManager Instance;
-
     [Header("Steal Settings")]
     [Tooltip("Максимальный шанс воровства в процентах")]
     public float maxStealChance = GameConfig.MAX_STEAL_CHANCE;
@@ -31,20 +29,9 @@ public class BattleManager : MonoBehaviour
     [Tooltip("Максимальное количество украденного сыра")]
     public int maxStolenCheese = GameConfig.NORMAL_MAX_STOLEN_CHEESE;
 
-    private void Awake()
+    protected override void OnInitialize()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-
-            // Применяем настройки из GameManager
-            ApplyTestModeSettings();
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        ApplyTestModeSettings();
     }
 
     private void ApplyTestModeSettings()

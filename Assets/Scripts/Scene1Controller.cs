@@ -2,12 +2,12 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class Scene1Controller : MonoBehaviour
+public class Scene1Controller : RatAwareUI
 {
     [SerializeField] private Button goToScene2Button;
     [SerializeField] private Text textCountCheese;
 
-    private void Start()
+    protected override void OnStart()
     {
         if (goToScene2Button != null)
             goToScene2Button.onClick.AddListener(GoToScene2);
@@ -16,14 +16,6 @@ public class Scene1Controller : MonoBehaviour
         {
             UpdateCheeseText(CurrencyManager.Instance.GetCheese());
             CurrencyManager.Instance.OnCheeseChanged += UpdateCheeseText;
-        }
-
-        // Подписываемся на события изменения крыс для обновления кнопки
-        if (RatManager.Instance != null)
-        {
-            RatManager.Instance.OnRatAdded += OnRatChanged;
-            RatManager.Instance.OnRatRemoved += OnRatChanged;
-            RatManager.Instance.OnRatUpdated += OnRatChanged;
         }
 
         // Проверяем состояние кнопки при старте
@@ -43,20 +35,13 @@ public class Scene1Controller : MonoBehaviour
         }
     }
 
-    private void OnDestroy()
+    protected override void OnCleanup()
     {
         if (CurrencyManager.Instance != null)
             CurrencyManager.Instance.OnCheeseChanged -= UpdateCheeseText;
-
-        if (RatManager.Instance != null)
-        {
-            RatManager.Instance.OnRatAdded -= OnRatChanged;
-            RatManager.Instance.OnRatRemoved -= OnRatChanged;
-            RatManager.Instance.OnRatUpdated -= OnRatChanged;
-        }
     }
 
-    private void OnRatChanged(Rat rat)
+    protected override void OnRatChanged(Rat rat)
     {
         UpdateAttackButtonState();
     }

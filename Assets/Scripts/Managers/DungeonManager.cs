@@ -66,7 +66,7 @@ public class DungeonManager : SingletonManager<DungeonManager>
         }
 
         // Стоимость ломания стены
-        int cost = 50 + (x + y) * 10;
+        int cost = GetBreakCost(x, y);
 
         if (!CurrencyManager.Instance.SpendCheese(cost))
         {
