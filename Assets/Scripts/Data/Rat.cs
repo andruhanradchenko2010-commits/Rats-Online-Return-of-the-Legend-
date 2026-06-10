@@ -24,8 +24,6 @@ public class Rat
     public int defibrillatorCount; // Сколько ДФР нужно (для закормленных)
     public float overfedTime; // Время закормки (для отслеживания смерти)
 
-    public Sprite sprite; // Спрайт крысы
-
     public Rat(RatType ratType, int startLevel)
     {
         id = Guid.NewGuid().ToString();

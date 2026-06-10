@@ -89,11 +89,11 @@ public class ShopUI : MonoBehaviour
     {
         if (InventoryManager.Instance.BuyItem(type))
         {
-            Debug.Log($"Куплен предмет: {type}");
+            GameLog.Log($"Куплен предмет: {type}");
         }
         else
         {
-            Debug.Log("Недостаточно средств!");
+            GameLog.Log("Недостаточно средств!");
         }
     }
 }

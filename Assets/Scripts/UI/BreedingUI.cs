@@ -178,7 +178,7 @@ public class BreedingUI : MonoBehaviour
 
         if (newRat != null)
         {
-            Debug.Log($"Скрещивание успешно! Получена {newRat.type.GetDisplayName()} уровня {newRat.level}");
+            GameLog.Log($"Скрещивание успешно! Получена {newRat.type.GetDisplayName()} уровня {newRat.level}");
             selectedRat1 = null;
             selectedRat2 = null;
             RefreshRatSelection();
@@ -188,7 +188,7 @@ public class BreedingUI : MonoBehaviour
         }
         else
         {
-            Debug.Log("Скрещивание не удалось!");
+            GameLog.Log("Скрещивание не удалось!");
         }
     }
 }

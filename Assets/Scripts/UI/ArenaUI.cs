@@ -114,7 +114,7 @@ public class ArenaUI : MonoBehaviour
 
     private void UpdatePlayerPositions()
     {
-        List<ArenaManager.ArenaPlayer> players = ArenaManager.Instance.GetPlayers();
+        IReadOnlyList<ArenaManager.ArenaPlayer> players = ArenaManager.Instance.GetPlayers();
 
         foreach (var player in players)
         {
@@ -148,7 +148,7 @@ public class ArenaUI : MonoBehaviour
 
     private void UpdateFood()
     {
-        List<ArenaManager.FoodItem> foodItems = ArenaManager.Instance.GetFoodItems();
+        IReadOnlyList<ArenaManager.FoodItem> foodItems = ArenaManager.Instance.GetFoodItems();
 
         // Удаляем собранную еду
         List<ArenaManager.FoodItem> toRemove = new List<ArenaManager.FoodItem>();
@@ -192,7 +192,8 @@ public class ArenaUI : MonoBehaviour
         UIHelper.ClearContainer(leaderboardContainer);
 
         // Заполняем таблицу
-        List<ArenaManager.ArenaPlayer> players = ArenaManager.Instance.GetPlayers();
+        // Своя сортируемая копия — не трогаем внутренний список менеджера
+        List<ArenaManager.ArenaPlayer> players = new List<ArenaManager.ArenaPlayer>(ArenaManager.Instance.GetPlayers());
         players.Sort((a, b) => b.score.CompareTo(a.score));
 
         for (int i = 0; i < players.Count; i++)

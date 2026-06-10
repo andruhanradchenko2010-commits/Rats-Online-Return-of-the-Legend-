@@ -3,7 +3,7 @@ using UnityEngine;
 public static class GameConfig
 {
     // Test Mode
-    public static bool IsTestMode => GameManager.Instance?.TEST_MODE ?? false;
+    public static bool IsTestMode => GameManager.Instance?.TestMode ?? false;
 
     // Heal Settings
     public const float NORMAL_HEAL_TIME = 30f;

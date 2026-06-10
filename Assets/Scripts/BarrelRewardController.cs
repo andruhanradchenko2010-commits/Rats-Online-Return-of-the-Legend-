@@ -22,7 +22,7 @@ public class BarrelRewardController : MonoBehaviour
 
     private void Start()
     {
-        Debug.Log("BarrelRewardController.Start: Инициализация");
+        GameLog.Log("BarrelRewardController.Start: Инициализация");
 
         if (barrel != null)
         {
@@ -30,7 +30,7 @@ public class BarrelRewardController : MonoBehaviour
             barrelButton = barrel.GetComponent<Button>();
             if (barrelButton != null)
                 barrelButton.onClick.AddListener(OnBarrelClicked);
-            Debug.Log("BarrelRewardController: Бочка найдена и настроена");
+            GameLog.Log("BarrelRewardController: Бочка найдена и настроена");
         }
         else
         {
@@ -40,7 +40,7 @@ public class BarrelRewardController : MonoBehaviour
         if (GameManager.Instance != null)
         {
             GameManager.Instance.OnBarrelRewardReady += ShowBarrel;
-            Debug.Log("BarrelRewardController: Подписка на событие OnBarrelRewardReady выполнена");
+            GameLog.Log("BarrelRewardController: Подписка на событие OnBarrelRewardReady выполнена");
         }
         else
         {
@@ -56,12 +56,12 @@ public class BarrelRewardController : MonoBehaviour
 
     private void ShowBarrel(int amount)
     {
-        Debug.Log($"BarrelRewardController.ShowBarrel вызван! amount={amount}");
+        GameLog.Log($"BarrelRewardController.ShowBarrel вызван! amount={amount}");
 
         // Не показываем бочку, если награда 0 или меньше
         if (amount <= 0)
         {
-            Debug.Log("BarrelRewardController: Награда 0 или меньше, бочка не показывается");
+            GameLog.Log("BarrelRewardController: Награда 0 или меньше, бочка не показывается");
             GameManager.Instance.ClearPendingReward();
             return;
         }
@@ -72,7 +72,7 @@ public class BarrelRewardController : MonoBehaviour
         if (barrel != null)
         {
             barrel.SetActive(true);
-            Debug.Log($"BarrelRewardController: Бочка показана! amount={amount}");
+            GameLog.Log($"BarrelRewardController: Бочка показана! amount={amount}");
             StartCoroutine(AutoDisappearBarrel());
         }
         else
@@ -150,7 +150,7 @@ public class BarrelRewardController : MonoBehaviour
         if (remainingCheese > 0)
         {
             GameManager.Instance.AddCheese(remainingCheese);
-            Debug.Log($"BarrelRewardController: Автособрано {remainingCheese} сыра");
+            GameLog.Log($"BarrelRewardController: Автособрано {remainingCheese} сыра");
 
             foreach (GameObject cheese in spawnedCheeses)
             {
@@ -169,7 +169,7 @@ public class BarrelRewardController : MonoBehaviour
             spawnedCheeses.Remove(cheese);
             Destroy(cheese);
             GameManager.Instance.AddCheese(1);
-            Debug.Log($"BarrelRewardController: Собран 1 сыр. Осталось: {spawnedCheeses.Count}");
+            GameLog.Log($"BarrelRewardController: Собран 1 сыр. Осталось: {spawnedCheeses.Count}");
         }
     }
 }

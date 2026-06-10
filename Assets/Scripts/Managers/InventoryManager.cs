@@ -91,7 +91,7 @@ public class InventoryManager : SingletonManager<InventoryManager>
     // Постройки
     private int couchLevel = 0;
 
-    public System.Action OnInventoryChanged;
+    public event System.Action OnInventoryChanged;
 
     protected override void OnInitialize()
     {
@@ -238,6 +238,11 @@ public class InventoryManager : SingletonManager<InventoryManager>
         return null;
     }
 
+    // Бонусы экипировки к характеристикам крысы
+    public int GetAttackBonus(string ratId) => GetEquippedItem(ratId) == ItemType.BrownGlove ? 10 : 0;
+    public int GetTheftBonus(string ratId) => GetEquippedItem(ratId) == ItemType.Hat ? 15 : 0;
+    public int GetEquipmentPowerBonus(string ratId) => GetAttackBonus(ratId) + GetTheftBonus(ratId);
+
     public int GetItemQuantity(ItemType type)
     {
         return inventory[type].quantity;
@@ -270,6 +275,19 @@ public class InventoryManager : SingletonManager<InventoryManager>
             SaveSystem.SaveInt($"Item_{kvp.Key}", kvp.Value.quantity);
         }
         SaveSystem.SaveInt("CouchLevel", couchLevel);
+
+        // Сохраняем экипировку крыс (JsonUtility не умеет Dictionary — пишем параллельными списками)
+        EquipmentSave eq = new EquipmentSave();
+        foreach (var kvp in ratEquipment)
+        {
+            if (kvp.Value.HasValue)
+            {
+                eq.ratIds.Add(kvp.Key);
+                eq.itemTypes.Add((int)kvp.Value.Value);
+            }
+        }
+        SaveSystem.SaveObject("RatEquipment", eq);
+
         SaveSystem.Save();
     }
 
@@ -280,5 +298,24 @@ public class InventoryManager : SingletonManager<InventoryManager>
             kvp.Value.quantity = SaveSystem.LoadInt($"Item_{kvp.Key}", 0);
         }
         couchLevel = SaveSystem.LoadInt("CouchLevel", 0);
+
+        // Загружаем экипировку крыс
+        ratEquipment.Clear();
+        EquipmentSave eq = SaveSystem.LoadObject("RatEquipment", new EquipmentSave());
+        if (eq?.ratIds != null && eq.itemTypes != null)
+        {
+            int count = Mathf.Min(eq.ratIds.Count, eq.itemTypes.Count);
+            for (int i = 0; i < count; i++)
+            {
+                ratEquipment[eq.ratIds[i]] = (ItemType)eq.itemTypes[i];
+            }
+        }
+    }
+
+    [System.Serializable]
+    private class EquipmentSave
+    {
+        public List<string> ratIds = new List<string>();
+        public List<int> itemTypes = new List<int>();
     }
 }

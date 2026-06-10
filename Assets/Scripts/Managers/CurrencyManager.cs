@@ -11,6 +11,11 @@ public class CurrencyManager : SingletonManager<CurrencyManager>
     private int playerExp = 0;
     private int playerLevel = 1;
 
+    // Флаг отложенной записи: значения пишутся в PlayerPrefs сразу (в память),
+    // а дорогой флэш на диск (PlayerPrefs.Save) делаем пачкой раз в несколько секунд.
+    private bool saveDirty = false;
+    private const float FLUSH_INTERVAL = 5f;
+
     // События для обновления UI
     public event Action<int> OnCheeseChanged;
     public event Action<int> OnLoveElixirsChanged;
@@ -22,13 +27,31 @@ public class CurrencyManager : SingletonManager<CurrencyManager>
     protected override void OnInitialize()
     {
         LoadData();
+        InvokeRepeating(nameof(FlushSave), FLUSH_INTERVAL, FLUSH_INTERVAL);
+    }
+
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+        CancelInvoke(nameof(FlushSave));
+        FlushSave();
+    }
+
+    private void OnApplicationPause(bool pause)
+    {
+        if (pause) FlushSave();
+    }
+
+    private void OnApplicationQuit()
+    {
+        FlushSave();
     }
 
     // Сыр
     public void AddCheese(int amount)
     {
         cheese += amount;
-        Debug.Log($"CurrencyManager.AddCheese: +{amount} сыра. Всего: {cheese}. Подписчиков на событие: {OnCheeseChanged?.GetInvocationList().Length ?? 0}");
+        GameLog.Log($"CurrencyManager.AddCheese: +{amount} сыра. Всего: {cheese}. Подписчиков на событие: {OnCheeseChanged?.GetInvocationList().Length ?? 0}");
         OnCheeseChanged?.Invoke(cheese);
         SaveData();
     }
@@ -165,7 +188,14 @@ public class CurrencyManager : SingletonManager<CurrencyManager>
         SaveSystem.SaveInt("RatBucks", ratBucks);
         SaveSystem.SaveInt("PlayerExp", playerExp);
         SaveSystem.SaveInt("PlayerLevel", playerLevel);
+        saveDirty = true; // дорогой флэш на диск отложен до FlushSave
+    }
+
+    private void FlushSave()
+    {
+        if (!saveDirty) return;
         SaveSystem.Save();
+        saveDirty = false;
     }
 
     private void LoadData()

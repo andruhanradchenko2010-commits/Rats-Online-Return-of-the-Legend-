@@ -124,12 +124,12 @@ public class RatsListUI : RatAwareUI
         Rat newRat = RatManager.Instance.CreateRatFromSouls();
         if (newRat != null)
         {
-            Debug.Log("Создана новая крыса!");
+            GameLog.Log("Создана новая крыса!");
             UpdateSoulCost();
         }
         else
         {
-            Debug.Log("Недостаточно душ!");
+            GameLog.Log("Недостаточно душ!");
         }
     }
 
@@ -148,12 +148,12 @@ public class RatsListUI : RatAwareUI
         {
             if (RatManager.Instance.FeedRat(selectedRat))
             {
-                Debug.Log("Крыса покормлена!");
+                GameLog.Log("Крыса покормлена!");
                 ShowRatDetail(selectedRat);
             }
             else
             {
-                Debug.Log("Недостаточно сыра или крыса не голодна!");
+                GameLog.Log("Недостаточно сыра или крыса не голодна!");
             }
         }
     }
@@ -179,12 +179,12 @@ public class RatsListUI : RatAwareUI
 
         if (healed)
         {
-            Debug.Log("Крыса вылечена!");
+            GameLog.Log("Крыса вылечена!");
             ShowRatDetail(selectedRat);
         }
         else
         {
-            Debug.Log("Недостаточно крысобаксов!");
+            GameLog.Log("Недостаточно крысобаксов!");
         }
     }
 
@@ -194,12 +194,12 @@ public class RatsListUI : RatAwareUI
         {
             if (RatManager.Instance.UpgradeSkill(selectedRat, skill, 1))
             {
-                Debug.Log($"Умение {skill} прокачано!");
+                GameLog.Log($"Умение {skill} прокачано!");
                 ShowRatDetail(selectedRat);
             }
             else
             {
-                Debug.Log("Недостаточно сыра!");
+                GameLog.Log("Недостаточно сыра!");
             }
         }
     }

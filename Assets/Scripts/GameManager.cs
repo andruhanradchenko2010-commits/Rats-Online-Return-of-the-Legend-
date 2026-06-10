@@ -5,7 +5,7 @@ public class GameManager : SingletonManager<GameManager>
 {
     [Header("🎮 TEST MODE")]
     [Tooltip("ВКЛЮЧИТЬ = быстрое тестирование, ВЫКЛЮЧИТЬ = нормальная игра")]
-    public bool TEST_MODE = true;
+    public bool TestMode = true;
 
     private int pendingCheeseReward = 0;
     private bool shouldShowBarrel = false;
@@ -72,12 +72,12 @@ public class GameManager : SingletonManager<GameManager>
     {
         pendingCheeseReward = amount;
         shouldShowBarrel = true;
-        Debug.Log($"GameManager.SetPendingReward: amount={amount}, shouldShowBarrel={shouldShowBarrel}");
+        GameLog.Log($"GameManager.SetPendingReward: amount={amount}, shouldShowBarrel={shouldShowBarrel}");
     }
 
     public bool ShouldShowBarrel()
     {
-        Debug.Log($"GameManager.ShouldShowBarrel: {shouldShowBarrel}, reward={pendingCheeseReward}");
+        GameLog.Log($"GameManager.ShouldShowBarrel: {shouldShowBarrel}, reward={pendingCheeseReward}");
         return shouldShowBarrel;
     }
 
@@ -88,12 +88,12 @@ public class GameManager : SingletonManager<GameManager>
 
     public void TriggerBarrelReward()
     {
-        Debug.Log($"GameManager.TriggerBarrelReward: shouldShowBarrel={shouldShowBarrel}, reward={pendingCheeseReward}");
+        GameLog.Log($"GameManager.TriggerBarrelReward: shouldShowBarrel={shouldShowBarrel}, reward={pendingCheeseReward}");
         if (shouldShowBarrel)
         {
             OnBarrelRewardReady?.Invoke(pendingCheeseReward);
             shouldShowBarrel = false;
-            Debug.Log($"🎉 Бочка вызвана! Награда: {pendingCheeseReward} сыра");
+            GameLog.Log($"🎉 Бочка вызвана! Награда: {pendingCheeseReward} сыра");
         }
     }
 

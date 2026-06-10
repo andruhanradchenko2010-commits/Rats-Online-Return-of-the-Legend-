@@ -85,7 +85,7 @@ public class Scene1Controller : RatAwareUI
         if (textCountCheese != null)
         {
             textCountCheese.text = count.ToString();
-            Debug.Log($"Scene1Controller.UpdateCheeseText: Обновлен текст сыра на {count}");
+            GameLog.Log($"Scene1Controller.UpdateCheeseText: Обновлен текст сыра на {count}");
         }
         else
         {

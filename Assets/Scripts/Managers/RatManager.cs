@@ -7,16 +7,24 @@ public class RatManager : SingletonManager<RatManager>
 {
     private List<Rat> rats = new List<Rat>();
 
+    // Отложенное сохранение: мутации крыс лишь помечают флаг, а тяжёлая сериализация
+    // всего списка выполняется пачкой (см. FlushRats).
+    private bool ratsDirty = false;
+    private const float RATS_FLUSH_INTERVAL = 3f;
+
     [Header("Heal Settings")]
     [Tooltip("Время восстановления подбитой крысы в секундах")]
-    public float healTimeSeconds = GameConfig.NORMAL_HEAL_TIME;
+    [SerializeField] private float healTimeSeconds = GameConfig.NORMAL_HEAL_TIME;
 
     [Header("Test Settings")]
     [Tooltip("Включить быстрое лечение для тестирования")]
-    public bool fastHealMode = false;
+    [SerializeField] private bool fastHealMode = false;
 
     [Tooltip("Время быстрого лечения в секундах")]
-    public float fastHealTimeSeconds = GameConfig.FAST_HEAL_TIME;
+    [SerializeField] private float fastHealTimeSeconds = GameConfig.FAST_HEAL_TIME;
+
+    // Текущее время лечения с учётом тестового режима
+    public float GetCurrentHealTime() => fastHealMode ? fastHealTimeSeconds : healTimeSeconds;
 
     public event Action<Rat> OnRatAdded;
     public event Action<Rat> OnRatRemoved;
@@ -27,12 +35,27 @@ public class RatManager : SingletonManager<RatManager>
         ApplyTestModeSettings();
         LoadRats();
         InvokeRepeating(nameof(CheckAndHealBeatenRats), 1f, 1f);
+        InvokeRepeating(nameof(CheckOverfedRats), 60f, 60f);
+        InvokeRepeating(nameof(FlushRats), RATS_FLUSH_INTERVAL, RATS_FLUSH_INTERVAL);
     }
 
     protected override void OnDestroy()
     {
         base.OnDestroy();
         CancelInvoke(nameof(CheckAndHealBeatenRats));
+        CancelInvoke(nameof(CheckOverfedRats));
+        CancelInvoke(nameof(FlushRats));
+        FlushRats();
+    }
+
+    private void OnApplicationPause(bool pause)
+    {
+        if (pause) FlushRats();
+    }
+
+    private void OnApplicationQuit()
+    {
+        FlushRats();
     }
 
     private void ApplyTestModeSettings()
@@ -41,12 +64,12 @@ public class RatManager : SingletonManager<RatManager>
         {
             fastHealMode = true;
             fastHealTimeSeconds = GameConfig.FAST_HEAL_TIME;
-            Debug.Log($"🎮 RatManager: ТЕСТОВЫЙ РЕЖИМ (лечение {fastHealTimeSeconds} сек)");
+            GameLog.Log($"🎮 RatManager: ТЕСТОВЫЙ РЕЖИМ (лечение {fastHealTimeSeconds} сек)");
         }
         else
         {
             fastHealMode = false;
-            Debug.Log($"⚔️ RatManager: НОРМАЛЬНЫЙ РЕЖИМ (лечение {healTimeSeconds} сек)");
+            GameLog.Log($"⚔️ RatManager: НОРМАЛЬНЫЙ РЕЖИМ (лечение {healTimeSeconds} сек)");
         }
     }
 
@@ -305,6 +328,7 @@ public class RatManager : SingletonManager<RatManager>
     public void CheckOverfedRats()
     {
         float deathTime = GameConfig.GetOverfedDeathTime();
+        bool anyDied = false;
 
         foreach (var rat in rats)
         {
@@ -312,10 +336,12 @@ public class RatManager : SingletonManager<RatManager>
             {
                 rat.Kill();
                 OnRatUpdated?.Invoke(rat);
+                anyDied = true;
             }
         }
 
-        SaveRats();
+        if (anyDied)
+            SaveRats();
     }
 
     public void RemoveRat(Rat rat)
@@ -331,10 +357,20 @@ public class RatManager : SingletonManager<RatManager>
     public int GetHealthyRatCount() => rats.Count(r => r.CanFight());
 
     // Сохранение/загрузка
+    // SaveRats только помечает данные «грязными» — фактическая JSON-сериализация
+    // всего списка делается пачкой в FlushRats, а не на каждое изменение крысы.
     private void SaveRats()
     {
+        ratsDirty = true;
+    }
+
+    private void FlushRats()
+    {
+        if (!ratsDirty) return;
         RatListWrapper wrapper = new RatListWrapper { rats = rats };
         SaveSystem.SaveObject("Rats", wrapper);
+        SaveSystem.Save();
+        ratsDirty = false;
     }
 
     private void LoadRats()

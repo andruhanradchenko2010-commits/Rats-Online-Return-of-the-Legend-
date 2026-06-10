@@ -64,7 +64,7 @@ public class TournamentUI : MonoBehaviour
     {
         if (RatManager.Instance.GetHealthyRatCount() < 1)
         {
-            Debug.Log("У вас нет здоровых крыс для турнира!");
+            GameLog.Log("У вас нет здоровых крыс для турнира!");
             return;
         }
 

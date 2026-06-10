@@ -14,7 +14,7 @@ public class Scene2Controller : MonoBehaviour
             openPanelButton.onClick.AddListener(OpenPanel);
 
         if (addCheeseButton != null)
-            addCheeseButton.onClick.AddListener(OnForwardButtonClicked);
+            addCheeseButton.onClick.AddListener(OnAttackButtonClicked);
 
         if (panel != null)
             panel.SetActive(false);
@@ -26,7 +26,7 @@ public class Scene2Controller : MonoBehaviour
             panel.SetActive(true);
     }
 
-    public void OnForwardButtonClicked()
+    public void OnAttackButtonClicked()
     {
         // Получаем первую крысу игрока
         var rats = RatManager.Instance.GetAllRats();
@@ -42,32 +42,31 @@ public class Scene2Controller : MonoBehaviour
         // Проверяем может ли крыса атаковать
         if (!playerRat.CanFight())
         {
-            Debug.Log("Крыса не может атаковать (подбита или мертва)");
+            GameLog.Log("Крыса не может атаковать (подбита или мертва)");
             GameManager.Instance.SetPendingReward(0);
             SceneManager.LoadScene("MainWindow");
             return;
         }
 
-        // Рассчитываем шанс воровства через BattleManager
+        // Единый бросок воровства через BattleManager (без начисления — сыр выдаст бочка на MainWindow)
         float stealChance = BattleManager.Instance.CalculateStealChance(playerRat);
-        float roll = Random.Range(0f, 100f);
+        BattleManager.StealResult steal = BattleManager.Instance.RollSteal(playerRat);
 
-        if (roll < stealChance)
+        if (steal.success)
         {
-            // Успех - крадем сыр
-            int stolenCheese = Random.Range(BattleManager.Instance.minStolenCheese, BattleManager.Instance.maxStolenCheese);
-            GameManager.Instance.SetPendingReward(stolenCheese);
+            // Успех - награду заберет бочка
+            GameManager.Instance.SetPendingReward(steal.cheese);
             playerRat.SetHungry();
-            Debug.Log($"✅ Успех! Украдено {stolenCheese} сыра. Шанс был {stealChance:F1}%");
-            Debug.Log($"📦 Установлена награда: {stolenCheese} сыра. Бочка должна появиться на MainWindow!");
+            GameLog.Log($"✅ Успех! Украдено {steal.cheese} сыра. Шанс был {stealChance:F1}%");
+            GameLog.Log($"📦 Установлена награда: {steal.cheese} сыра. Бочка должна появиться на MainWindow!");
         }
         else
         {
             // Провал - крыса подбита
             playerRat.Beat();
             GameManager.Instance.SetPendingReward(0);
-            Debug.Log($"❌ Провал! Крыса подбита на {(RatManager.Instance.fastHealMode ? RatManager.Instance.fastHealTimeSeconds : RatManager.Instance.healTimeSeconds)} секунд. Шанс был {stealChance:F1}%");
-            Debug.Log($"📦 Награда = 0. Бочка НЕ должна появиться.");
+            GameLog.Log($"❌ Провал! Крыса подбита на {RatManager.Instance.GetCurrentHealTime():F0} секунд. Шанс был {stealChance:F1}%");
+            GameLog.Log($"📦 Награда = 0. Бочка НЕ должна появиться.");
         }
 
         SceneManager.LoadScene("MainWindow");

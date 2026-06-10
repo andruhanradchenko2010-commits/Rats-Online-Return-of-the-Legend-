@@ -42,7 +42,7 @@ public class BarrelRewardSetup : MonoBehaviour
         so.FindProperty("cheeseSpawnRadius").vector2Value = new Vector2(200f, 150f);
         so.ApplyModifiedProperties();
 
-        Debug.Log("Barrel Reward System setup complete!");
+        GameLog.Log("Barrel Reward System setup complete!");
         EditorUtility.SetDirty(controller);
     }
 

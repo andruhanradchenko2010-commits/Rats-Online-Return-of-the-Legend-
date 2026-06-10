@@ -80,6 +80,8 @@ public class BattleUI : MonoBehaviour
         {
             info += $"• {rat.type.GetDisplayName()} Ур.{rat.level}\n";
             totalPower += rat.GetTotalPower();
+            if (InventoryManager.Instance != null)
+                totalPower += InventoryManager.Instance.GetEquipmentPowerBonus(rat.id);
         }
 
         info += $"\nОбщая сила: {totalPower}";

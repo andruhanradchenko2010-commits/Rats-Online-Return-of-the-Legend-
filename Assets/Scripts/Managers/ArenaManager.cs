@@ -29,10 +29,10 @@ public class ArenaManager : SingletonManager<ArenaManager>
     private bool roundActive = false;
 
     [Header("Arena Settings")]
-    public Vector2 arenaSize = new Vector2(800f, 600f);
-    public int maxPlayers = 8;
-    public float foodSpawnInterval = GameConfig.ARENA_FOOD_SPAWN_INTERVAL;
-    public int maxFoodItems = GameConfig.ARENA_MAX_FOOD_ITEMS;
+    [SerializeField] private Vector2 arenaSize = new Vector2(800f, 600f);
+    [SerializeField] private int maxPlayers = 8;
+    [SerializeField] private float foodSpawnInterval = GameConfig.ARENA_FOOD_SPAWN_INTERVAL;
+    [SerializeField] private int maxFoodItems = GameConfig.ARENA_MAX_FOOD_ITEMS;
 
     private float lastFoodSpawnTime;
 
@@ -219,8 +219,9 @@ public class ArenaManager : SingletonManager<ArenaManager>
         }
     }
 
-    public List<ArenaPlayer> GetPlayers() => new List<ArenaPlayer>(players);
-    public List<FoodItem> GetFoodItems() => new List<FoodItem>(foodItems);
+    // Возвращаем живые списки без копии — UI читает их часто (раз в 0.1с) и только на чтение
+    public IReadOnlyList<ArenaPlayer> GetPlayers() => players;
+    public IReadOnlyList<FoodItem> GetFoodItems() => foodItems;
     public float GetRemainingTime() => currentTime;
     public bool IsRoundActive() => roundActive;
     public Vector2 GetArenaSize() => arenaSize;

@@ -6,28 +6,28 @@ public class BattleManager : SingletonManager<BattleManager>
 {
     [Header("Steal Settings")]
     [Tooltip("Максимальный шанс воровства в процентах")]
-    public float maxStealChance = GameConfig.MAX_STEAL_CHANCE;
+    [SerializeField] private float maxStealChance = GameConfig.MAX_STEAL_CHANCE;
 
     [Tooltip("Шанс воровства на 1 уровне крысы в процентах")]
-    public float minStealChance = GameConfig.MIN_STEAL_CHANCE;
+    [SerializeField] private float minStealChance = GameConfig.MIN_STEAL_CHANCE;
 
     [Tooltip("Уровень крысы для достижения максимального шанса")]
-    public int levelForMaxChance = GameConfig.LEVEL_FOR_MAX_STEAL_CHANCE;
+    [SerializeField] private int levelForMaxChance = GameConfig.LEVEL_FOR_MAX_STEAL_CHANCE;
 
     [Header("Test Settings")]
     [Tooltip("Включить режим тестирования (фиксированный шанс)")]
-    public bool testMode = false;
+    [SerializeField] private bool testMode = false;
 
     [Tooltip("Фиксированный шанс воровства в тестовом режиме (0-100%)")]
     [Range(0f, 100f)]
-    public float testStealChance = 100f;
+    [SerializeField] private float testStealChance = 100f;
 
     [Header("Rewards")]
     [Tooltip("Минимальное количество украденного сыра")]
-    public int minStolenCheese = GameConfig.NORMAL_MIN_STOLEN_CHEESE;
+    [SerializeField] private int minStolenCheese = GameConfig.NORMAL_MIN_STOLEN_CHEESE;
 
     [Tooltip("Максимальное количество украденного сыра")]
-    public int maxStolenCheese = GameConfig.NORMAL_MAX_STOLEN_CHEESE;
+    [SerializeField] private int maxStolenCheese = GameConfig.NORMAL_MAX_STOLEN_CHEESE;
 
     protected override void OnInitialize()
     {
@@ -42,14 +42,14 @@ public class BattleManager : SingletonManager<BattleManager>
             testStealChance = 100f;
             minStolenCheese = GameConfig.TEST_MIN_STOLEN_CHEESE;
             maxStolenCheese = GameConfig.TEST_MAX_STOLEN_CHEESE;
-            Debug.Log($"🎮 BattleManager: ТЕСТОВЫЙ РЕЖИМ (100% успех, {minStolenCheese}-{maxStolenCheese} сыра)");
+            GameLog.Log($"🎮 BattleManager: ТЕСТОВЫЙ РЕЖИМ (100% успех, {minStolenCheese}-{maxStolenCheese} сыра)");
         }
         else
         {
             testMode = false;
             minStolenCheese = GameConfig.NORMAL_MIN_STOLEN_CHEESE;
             maxStolenCheese = GameConfig.NORMAL_MAX_STOLEN_CHEESE;
-            Debug.Log("⚔️ BattleManager: НОРМАЛЬНЫЙ РЕЖИМ (баланс)");
+            GameLog.Log("⚔️ BattleManager: НОРМАЛЬНЫЙ РЕЖИМ (баланс)");
         }
     }
 
@@ -78,6 +78,32 @@ public class BattleManager : SingletonManager<BattleManager>
         return Mathf.Clamp(chance, minStealChance, maxStealChance);
     }
 
+    // Результат попытки воровства (без начисления сыра — решает вызывающий код)
+    public struct StealResult
+    {
+        public bool success;
+        public int cheese;
+    }
+
+    // Единый бросок воровства для одной крысы — общий для PvP и сцены кражи
+    public StealResult RollSteal(Rat rat, int maxCheeseAvailable = int.MaxValue)
+    {
+        float chance = CalculateStealChance(rat);
+        bool success = Random.Range(0f, 100f) < chance;
+        int cheese = success
+            ? Mathf.Min(maxCheeseAvailable, Random.Range(minStolenCheese, maxStolenCheese))
+            : 0;
+        return new StealResult { success = success, cheese = cheese };
+    }
+
+    // Бонус к силе крысы от надетой экипировки
+    private int GetEquipmentBonus(Rat rat)
+    {
+        return InventoryManager.Instance != null
+            ? InventoryManager.Instance.GetEquipmentPowerBonus(rat.id)
+            : 0;
+    }
+
     // PvP атака на другого игрока
     public BattleResult AttackPlayer(List<Rat> enemyRats, int enemyCheese)
     {
@@ -99,17 +125,14 @@ public class BattleManager : SingletonManager<BattleManager>
         // Берем первую крысу для атаки (можно расширить логику)
         Rat attackingRat = playerRats[0];
 
-        // Рассчитываем шанс воровства на основе уровня крысы
-        float stealChance = CalculateStealChance(attackingRat);
+        // Единый бросок воровства
+        StealResult steal = RollSteal(attackingRat, enemyCheese);
+        result.victory = steal.success;
 
-        // Проверяем успех воровства
-        float roll = Random.Range(0f, 100f);
-        result.victory = roll < stealChance;
-
-        if (result.victory)
+        if (steal.success)
         {
             // Успешное воровство - крадем сыр
-            result.cheeseStolen = Mathf.Min(enemyCheese, Random.Range(minStolenCheese, maxStolenCheese));
+            result.cheeseStolen = steal.cheese;
             CurrencyManager.Instance.AddCheese(result.cheeseStolen);
 
             // Крыса становится голодной после успешной атаки
@@ -221,7 +244,7 @@ public class BattleManager : SingletonManager<BattleManager>
         TournamentResult result = new TournamentResult();
 
         List<Rat> playerRats = RatManager.Instance.GetRandomBattleRats(5);
-        int playerPower = playerRats.Sum(r => r.GetTotalPower());
+        int playerPower = playerRats.Sum(r => r.GetTotalPower() + GetEquipmentBonus(r));
 
         // Генерируем 10 противников
         int playerLevel = CurrencyManager.Instance.GetPlayerLevel();

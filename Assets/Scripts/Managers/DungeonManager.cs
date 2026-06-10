@@ -61,7 +61,7 @@ public class DungeonManager : SingletonManager<DungeonManager>
         // Проверяем, есть ли рядом проложенный путь
         if (!HasAdjacentPath(x, y))
         {
-            Debug.Log("Нет пути рядом с этой стеной!");
+            GameLog.Log("Нет пути рядом с этой стеной!");
             return false;
         }
 
@@ -70,7 +70,7 @@ public class DungeonManager : SingletonManager<DungeonManager>
 
         if (!CurrencyManager.Instance.SpendCheese(cost))
         {
-            Debug.Log("Недостаточно сыра для ломания стены!");
+            GameLog.Log("Недостаточно сыра для ломания стены!");
             return false;
         }
 

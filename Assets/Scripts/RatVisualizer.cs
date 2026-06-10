@@ -27,7 +27,7 @@ public class RatVisualizer : RatAwareUI, IPointerClickHandler
             {
                 healthyRatSprite = SpriteHelper.LoadRatSprite(RatType.Gray);
             }
-            Debug.Log($"RatVisualizer: Загружен спрайт здоровой крысы: {healthyRatSprite != null}");
+            GameLog.Log($"RatVisualizer: Загружен спрайт здоровой крысы: {healthyRatSprite != null}");
         }
 
         if (woundedRatSprite == null)
@@ -38,7 +38,7 @@ public class RatVisualizer : RatAwareUI, IPointerClickHandler
                 // Пытаемся найти в Assets/Sprite/Types of rats/
                 woundedRatSprite = Resources.Load<Sprite>("Types of rats/Wounded rat");
             }
-            Debug.Log($"RatVisualizer: Загружен спрайт раненой крысы: {woundedRatSprite != null}");
+            GameLog.Log($"RatVisualizer: Загружен спрайт раненой крысы: {woundedRatSprite != null}");
         }
 
         UpdateRatVisual();
@@ -68,7 +68,7 @@ public class RatVisualizer : RatAwareUI, IPointerClickHandler
         if (rats.Count == 0)
         {
             ratImage.enabled = false;
-            Debug.Log("RatVisualizer: Нет крыс, Image отключен");
+            GameLog.Log("RatVisualizer: Нет крыс, Image отключен");
             return;
         }
 
@@ -81,7 +81,7 @@ public class RatVisualizer : RatAwareUI, IPointerClickHandler
             if (woundedRatSprite != null)
             {
                 ratImage.sprite = woundedRatSprite;
-                Debug.Log($"RatVisualizer: Установлен спрайт РАНЕНОЙ крысы (состояние: {rat.state})");
+                GameLog.Log($"RatVisualizer: Установлен спрайт РАНЕНОЙ крысы (состояние: {rat.state})");
             }
             else
             {
@@ -93,7 +93,7 @@ public class RatVisualizer : RatAwareUI, IPointerClickHandler
             if (healthyRatSprite != null)
             {
                 ratImage.sprite = healthyRatSprite;
-                Debug.Log($"RatVisualizer: Установлен спрайт здоровой крысы (состояние: {rat.state})");
+                GameLog.Log($"RatVisualizer: Установлен спрайт здоровой крысы (состояние: {rat.state})");
             }
             else
             {
@@ -120,12 +120,12 @@ public class RatVisualizer : RatAwareUI, IPointerClickHandler
             {
                 if (RatManager.Instance.FeedRat(rat))
                 {
-                    Debug.Log($"Крыса накормлена! Потрачено {cheeseNeeded} сыра.");
+                    GameLog.Log($"Крыса накормлена! Потрачено {cheeseNeeded} сыра.");
                 }
             }
             else
             {
-                Debug.Log($"Недостаточно сыра! Нужно: {cheeseNeeded}");
+                GameLog.Log($"Недостаточно сыра! Нужно: {cheeseNeeded}");
             }
         }
         // Если крыса не голодная - прокачиваем умение "Воровство"
@@ -136,12 +136,12 @@ public class RatVisualizer : RatAwareUI, IPointerClickHandler
             {
                 if (RatManager.Instance.UpgradeSkill(rat, RatSkill.Theft, 1))
                 {
-                    Debug.Log($"Умение 'Воровство' прокачано! Потрачено {upgradeCost} сыра. Теперь: {rat.theftSkill}");
+                    GameLog.Log($"Умение 'Воровство' прокачано! Потрачено {upgradeCost} сыра. Теперь: {rat.theftSkill}");
                 }
             }
             else
             {
-                Debug.Log($"Недостаточно сыра для прокачки! Нужно: {upgradeCost}");
+                GameLog.Log($"Недостаточно сыра для прокачки! Нужно: {upgradeCost}");
             }
         }
     }

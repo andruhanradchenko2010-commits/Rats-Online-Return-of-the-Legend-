@@ -76,7 +76,7 @@ public static class SaveSystem
 
     public static List<T> LoadList<T>(string key)
     {
-        ListWrapper<T> wrapper = LoadObject<T, ListWrapper<T>>(key, new ListWrapper<T>());
+        ListWrapper<T> wrapper = LoadObject(key, new ListWrapper<T>());
         return wrapper.items ?? new List<T>();
     }
 
@@ -104,22 +104,5 @@ public static class SaveSystem
     private class ListWrapper<T>
     {
         public List<T> items;
-    }
-
-    private static TValue LoadObject<TKey, TValue>(string key, TValue defaultValue)
-    {
-        string json = LoadString(key, "");
-        if (string.IsNullOrEmpty(json))
-            return defaultValue;
-
-        try
-        {
-            return JsonUtility.FromJson<TValue>(json);
-        }
-        catch
-        {
-            Debug.LogWarning($"Failed to deserialize {key}. Returning default value.");
-            return defaultValue;
-        }
     }
 }

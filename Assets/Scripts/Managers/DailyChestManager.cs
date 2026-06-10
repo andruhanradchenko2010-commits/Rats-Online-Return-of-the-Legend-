@@ -165,7 +165,8 @@ public class DailyChestManager : SingletonManager<DailyChestManager>
 
     private void SaveData()
     {
-        SaveSystem.SaveString("LastChestTime", lastChestTime.ToString());
+        // Храним время как тики (long) — не зависит от локали системы
+        SaveSystem.SaveString("LastChestTime", lastChestTime.Ticks.ToString());
         SaveSystem.SaveBool("ChestAvailable", chestAvailable);
 
         // Сохраняем квесты
@@ -184,13 +185,13 @@ public class DailyChestManager : SingletonManager<DailyChestManager>
     private void LoadData()
     {
         string lastChestStr = SaveSystem.LoadString("LastChestTime", "");
-        if (string.IsNullOrEmpty(lastChestStr))
+        if (!string.IsNullOrEmpty(lastChestStr) && long.TryParse(lastChestStr, out long ticks))
         {
-            lastChestTime = DateTime.Now.AddHours(-25); // Сундук доступен сразу
+            lastChestTime = new DateTime(ticks);
         }
         else
         {
-            DateTime.TryParse(lastChestStr, out lastChestTime);
+            lastChestTime = DateTime.Now.AddHours(-25); // Сундук доступен сразу
         }
 
         chestAvailable = SaveSystem.LoadBool("ChestAvailable", false);
